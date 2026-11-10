@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>웹방화벽(WAF) | 보안장비 자세히 보기 | AION Tech Blog</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="mast"><div><b>AION Tech Blog</b><span><a href="../index.html">보안은 어떻게 진화했나</a> › <a href="index.html">보안장비 자세히 보기</a></span></div></header>
+<main>
+<p class="kicker">보안장비 자세히 보기 · 4 / 9</p>
+<h1>웹방화벽(WAF)</h1>
+<p class="dek">웹 서버 바로 앞 · 본문 <a href="../index.html#s3">3장</a></p>
+<p class="ask"><small>이 장비가 답하는 질문</small>이 웹 요청이 웹 서비스를 속이려 하는가</p>
+<ol class="path"><li>인터넷</li><li>DDoS 대응장비</li><li>방화벽</li><li>IPS</li><li class="on">웹방화벽</li><li>웹 서버</li></ol>
+<article>
+
+<h2>어디에 서 있나</h2>
+<p>웹방화벽은 웹 서버 바로 앞에 섭니다. 배치도에서는 위 갈래, 웹 서비스 구역의 입구입니다. 별도 장비로 둘 수도 있고, 웹 서버 안의 모듈로 넣을 수도 있으며, 클라우드 업체가 서비스로 제공하기도 합니다. 웹 서버 앞에 서기 때문에 서버 인증서를 넣어 HTTPS 암호를 풀고 요청 내용을 볼 수 있습니다. 웹방화벽은 웹 요청 하나하나를 칸별로 풀어 해석하는 데 집중합니다.</p>
+
+<h2>무엇을 보고 판단하나</h2>
+
+<h3>웹 요청을 칸별로 나눠 본다</h3>
+<p>웹 요청은 요청 줄(어느 주소를 무슨 방식으로), 헤더(브라우저 이름, 쿠키 등), 본문(로그인 창에 적은 값 등)으로 이뤄집니다. 웹방화벽은 요청을 이 칸들로 나누고, 칸마다 공격의 흔적이 있는지 봅니다. 예를 들어 상품 번호를 받는 주소가 있다고 하겠습니다.</p>
+<pre class="log"><span class="c">정상 요청</span>
+GET /item?<span class="k">id</span>=1024 HTTP/1.1
+
+<span class="c">공격 요청 (주소창 그대로)</span>
+GET /item?<span class="k">id</span>=1%27%20or%20%271%27%3D%271 HTTP/1.1
+
+<span class="c">웹방화벽이 인코딩을 풀어서 본 id 값</span>
+1' or '1'='1</pre>
+<p>공격자는 상품 번호 자리에 데이터베이스 명령의 일부를 끼워 넣었습니다. 서버 프로그램이 이 값을 그대로 데이터베이스 질의에 붙이면 「번호가 1이거나, 1은 1이다」라는 늘 참인 조건이 되어, 상품 하나가 아니라 표 전체가 나올 수 있습니다. 이 공격을 SQL 인젝션이라고 합니다. 주소창의 <code>%27</code>은 작은따옴표를 인코딩한 것입니다. 공격자는 이렇게 글자를 감춰 검사를 피하려 하므로, 웹방화벽은 검사 전에 인코딩을 먼저 풉니다.</p>
+
+<h3>규칙의 실제 모습: OWASP CRS 942100</h3>
+<p>많은 웹방화벽이 참고하는 공개 규칙 모음이 OWASP CRS(Core Rule Set)입니다. 그중 SQL 인젝션을 찾는 942100번 규칙의 일부를 원문 그대로 옮기면 이렇습니다.</p>
+<pre class="log">SecRule <span class="k">REQUEST_COOKIES</span>|REQUEST_COOKIES_NAMES|<span class="k">REQUEST_HEADERS:User-Agent</span>|REQUEST_HEADERS:Referer|ARGS_NAMES|<span class="k">ARGS</span>|XML:/*|XML://@* "<span class="k">@detectSQLi</span>" \
+"id:942100,\
+phase:2,\
+block,\
+t:none,t:utf8toUnicode,<span class="k">t:urlDecodeUni</span>,t:removeNulls,\
+<span class="k">msg</span>:'SQL Injection Attack Detected via libinjection',\
+<span class="k">logdata</span>:'Matched Data: %{TX.0} found within %{MATCHED_VAR_NAME}: %{MATCHED_VAR}',\
+tag:'attack-sqli',\
+<span class="k">severity</span>:'CRITICAL',\
+setvar:'<span class="k">tx.inbound_anomaly_score_pl1</span>=+%{tx.critical_anomaly_score}',\
+..."</pre>
+<p class="src">출처: OWASP CRS 저장소, REQUEST-942-APPLICATION-ATTACK-SQLI.conf. 줄 일부를 생략했습니다.</p>
+<p>첫 줄은 어디를 볼지 정합니다. 쿠키, 브라우저 이름(User-Agent), 이전 페이지 주소(Referer), 매개변수 이름과 값(ARGS)을 모두 봅니다. <code>@detectSQLi</code>는 libinjection이라는 SQL 인젝션 판별 라이브러리로 검사하라는 뜻이고, <code>t:urlDecodeUni</code>는 검사 전에 위에서 본 <code>%27</code> 같은 인코딩을 풀라는 뜻입니다. 이 규칙은 걸려도 바로 끊지 않습니다. 마지막 <code>setvar</code> 줄처럼 요청의 이상 점수에 「치명(CRITICAL)」 등급만큼 점수를 더하고, 여러 규칙의 점수가 쌓여 기준을 넘는지를 따로 판정해 막습니다. 규칙 하나의 오탐으로 정상 요청이 끊기는 일을 줄이려는 설계입니다.</p>
+
+<h3>오탐을 줄이는 일</h3>
+<p>게시판에 SQL 문법을 설명하는 글을 올리는 사용자는 공격자처럼 보입니다. 그래서 웹방화벽을 들일 때는 서비스의 정상 요청을 한동안 흘려 보며 오탐이 나는 주소와 매개변수를 예외로 빼는 작업을 거칩니다. 이 작업을 건너뛰고 차단부터 켜면 정상 고객의 주문이 막힐 수 있습니다.</p>
+
+<h2>전체 그림에서의 뜻</h2>
+<p>2000년대에 은행, 쇼핑, 민원이 웹으로 옮겨 가자 공격도 웹 서비스 자체를 노렸습니다. 방화벽은 443번 포트를 열어 두었으니 통과시켰고, IPS의 시그니처는 통신 속 특징 문자열을 찾는 방식이라 웹 요청을 칸별로 풀어 해석하는 데 한계가 있었습니다. 웹방화벽은 이 자리를 맡으려고 생겼습니다. 다만 웹방화벽은 웹 서비스로 들어오는 요청만 봅니다. 직원이 피싱 메일의 첨부를 열어 PC가 감염되는 경로는 웹방화벽 앞을 지나지 않습니다. 그 경로는 <a href="edr.html">EDR</a>의 몫입니다.</p>
+
+<h2>로그로 읽기</h2>
+<p>웹방화벽 로그는 「어떤 요청이 어느 규칙에 걸렸고, 어떻게 처리했나」를 남깁니다. 제품마다 형식이 다르므로, 아래 표는 942100 규칙이 남기는 칸(msg, logdata, severity, tag)에 위 공격 요청을 넣어 설명용으로 만든 예시입니다. 주소는 문서용 예시 주소입니다.</p>
+<div class="tbl"><table>
+<tr><th>칸</th><th>예시 값</th><th>읽는 법</th></tr>
+<tr><td>시각 · 출발지</td><td>2026-11-10 14:02:11 · 203.0.113.45</td><td>언제, 누가. 바깥 출발지는 다른 사람의 감염된 PC나 빌린 서버인 경우가 많아, 출발지 주소가 곧 공격자라고 단정하지 않습니다.</td></tr>
+<tr><td>요청</td><td><code>GET /item?id=1' or '1'='1</code></td><td>어느 페이지의 어느 매개변수를 노렸나.</td></tr>
+<tr><td>규칙 id · msg</td><td>942100 · SQL Injection Attack Detected via libinjection</td><td>무엇으로 판단했나.</td></tr>
+<tr><td>logdata</td><td>Matched Data: … found within ARGS:id: 1' or '1'='1</td><td>요청의 어느 칸(<code>ARGS:id</code>)에서 걸렸나. 예외 처리를 할 때 이 칸 이름을 씁니다.</td></tr>
+<tr><td>severity · tag</td><td>CRITICAL · attack-sqli</td><td>무게와 공격 분류.</td></tr>
+<tr><td>처리</td><td>차단(응답 403)</td><td>막았나, 기록만 했나.</td></tr>
+</table></div>
+<p>웹방화벽 뒤의 웹 서버도 요청마다 접근 로그를 남깁니다. Apache 웹 서버의 기본 형식으로 쓰면 위 요청은 이렇게 남습니다.</p>
+<pre class="log">203.0.113.45 - - [10/Nov/2026:14:02:11 +0900] "GET /item?id=1%27%20or%20%271%27%3D%271 HTTP/1.1" <span class="k">403</span> <span class="k">199</span></pre>
+<p class="src">형식: Apache HTTP Server 문서, Common Log Format(출발지, 시각, 요청 줄, 응답 코드, 응답 크기). 값은 예시입니다.</p>
+<p>끝의 두 숫자가 중요합니다. <code>403</code>은 「거부」, <code>199</code>는 돌려준 바이트 수입니다. 같은 요청에 <code>200</code>과 수십만 바이트가 찍혔다면 서버가 요청을 받아들여 많은 내용을 돌려준 것이므로, 공격이 통했을 가능성을 먼저 확인해야 합니다.</p>
+
+<h3>이 로그로 답할 수 있는 질문</h3>
+<ul>
+  <li>요즘 우리 서비스에서 가장 많이 노려지는 주소와 매개변수는 어디인가</li>
+  <li>한 출발지가 SQL 인젝션, 스크립트 삽입, 파일 경로 조작을 차례로 시도했나(자동 취약점 점검 도구의 흔적)</li>
+  <li>공격이 막혔나, 통과했나. 웹방화벽 처리 결과와 웹 서버의 응답 코드·크기를 함께 봅니다.</li>
+</ul>
+
+<h3>이 로그만으로는 모르는 것</h3>
+<p>요청이 통과해 서버까지 갔을 때, 서버 안에서 무슨 일이 벌어졌는지는 웹방화벽이 보지 못합니다. 웹 서버에서 평소 없던 프로그램이 실행됐다면 <a href="edr.html">EDR</a> 로그에, 데이터베이스에서 평소보다 많은 행이 조회됐다면 데이터베이스 접근 기록에 흔적이 남습니다. 세 기록을 시각으로 이어 붙이는 일은 <a href="siem.html">SIEM</a>에서 합니다.</p>
+
+<h2>확인 질문</h2>
+<ol>
+  <li>웹방화벽이 요청을 검사하기 전에 인코딩을 먼저 푸는 까닭은 무엇인가요?</li>
+  <li>웹 서버 접근 로그에서 공격 요청의 응답 코드가 403일 때와 200일 때, 각각 무엇을 뜻하나요?</li>
+</ol>
+
+<h2>더 공부할 것</h2>
+<ul>
+  <li>OWASP Top 10: 웹 서비스의 대표 취약점 정리</li>
+  <li>SQL 인젝션을 서버 프로그램에서 막는 방법(매개변수화 질의). 웹방화벽은 덧대는 방어이고, 근본 처방은 프로그램을 고치는 일입니다.</li>
+  <li>원문: <a href="https://github.com/coreruleset/coreruleset/blob/main/rules/REQUEST-942-APPLICATION-ATTACK-SQLI.conf">OWASP CRS, REQUEST-942 규칙 파일</a> · <a href="https://httpd.apache.org/docs/2.4/logs.html">Apache HTTP Server, Log Files</a></li>
+</ul>
+
+<nav class="pager"><a href="ips.html"><span>앞 장비</span>침입방지시스템(IPS)</a><a href="vpn.html" style="text-align:right"><span>다음 장비</span>VPN</a></nav>
+</article>
+</main>
+<footer>아이온퓨처 전략기획팀 · <a href="index.html">보안장비 자세히 보기</a> · <a href="../index.html">본문으로</a></footer>
+</body>
+</html>
