@@ -1,0 +1,49 @@
+@font-face{font-family:'MaruBuri';font-weight:400;font-display:swap;src:url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Regular.woff2) format('woff2')}
+@font-face{font-family:'MaruBuri';font-weight:700;font-display:swap;src:url(https://hangeul.pstatic.net/hangeul_static/webfont/MaruBuri/MaruBuri-Bold.woff2) format('woff2')}
+:root{--paper:#f7f4ee;--ink:#1c1b19;--soft:#5d5a53;--rule:#d9d3c7;--accent:#8c1d18;--code:#15171a;--codeink:#e8e6e1;--card:#fffdf9;--hl:#f2c94c}
+@media (prefers-color-scheme:dark){:root{--paper:#14130f;--ink:#ece8df;--soft:#a39e92;--rule:#34312a;--accent:#e0675e;--code:#0c0d0f;--codeink:#e8e6e1;--card:#1b1a16}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 17.5px/1.9 "Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:break-word}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
+.mast{border-bottom:1px solid var(--rule);padding:18px max(16px,env(safe-area-inset-left)) 14px}
+.mast div{max-width:760px;margin:0 auto;display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.mast b{font:700 13px/1 "Pretendard Variable",Pretendard,system-ui,sans-serif;letter-spacing:.28em;text-transform:uppercase}
+.mast span{font-size:13px;color:var(--soft);letter-spacing:.02em}
+.mast span a{color:var(--soft);border-bottom-color:var(--rule)}
+main{max-width:760px;margin:0 auto;padding:48px max(16px,env(safe-area-inset-left)) 96px}
+.kicker{color:var(--accent);font:700 12.5px/1 "Pretendard Variable",Pretendard,system-ui,sans-serif;letter-spacing:.22em;margin:0 0 20px}
+h1{font:700 clamp(32px,5.5vw,48px)/1.25 MaruBuri,AppleMyungjo,Batang,serif;letter-spacing:-.02em;margin:0 0 16px}
+.dek{color:var(--soft);font-size:15px;margin:0 0 28px}
+.ask{font:600 clamp(21px,3.2vw,26px)/1.6 MaruBuri,AppleMyungjo,Batang,serif;margin:0 0 30px;padding-left:20px;border-left:3px solid var(--accent)}
+.ask small{display:block;font:700 12px/1.4 "Pretendard Variable",Pretendard,system-ui,sans-serif;letter-spacing:.16em;color:var(--soft);margin-bottom:6px}
+/* 배치도 위의 자리 */
+.path{list-style:none;display:flex;flex-wrap:wrap;gap:6px 4px;padding:14px 16px;margin:0 0 40px;background:var(--card);border:1px solid var(--rule);border-radius:6px;font-size:13.5px;line-height:1.5}
+.path li{display:flex;align-items:center;color:var(--soft)}
+.path li+li::before{content:"→";margin:0 8px 0 4px;color:var(--rule)}
+.path li.on{color:var(--paper);background:var(--accent);padding:2px 10px;border-radius:3px;font-weight:700}
+.path li.side{font-style:normal}
+article h2{font:700 25px/1.4 MaruBuri,AppleMyungjo,Batang,serif;margin:60px 0 16px;padding-top:20px;border-top:1px solid var(--rule)}
+article h3{font:700 18.5px/1.5 "Pretendard Variable",Pretendard,system-ui,sans-serif;margin:36px 0 10px}
+article p{margin:0 0 20px}
+article ul,article ol{padding-left:1.3em;margin:0 0 22px}
+article li{margin:0 0 10px}
+.tbl{overflow-x:auto;margin:6px 0 28px}
+article table{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.65}
+article th{text-align:left;font-weight:700;border-bottom:2px solid var(--ink);padding:10px 12px 10px 0;white-space:nowrap}
+article td{border-bottom:1px solid var(--rule);padding:11px 12px 11px 0;vertical-align:top}
+article td code,article p code,article li code{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.86em;background:color-mix(in srgb,var(--ink) 8%,transparent);padding:1px 5px;border-radius:4px;word-break:break-all}
+/* 로그 */
+pre.log{background:var(--code);color:var(--codeink);padding:18px 20px;border-radius:6px;overflow-x:auto;font:400 13px/1.75 "JetBrains Mono",ui-monospace,monospace;margin:8px 0 8px;white-space:pre}
+pre.log .k{color:var(--hl)}
+pre.log .c{color:#8f8a80}
+.src{font-size:12.5px;color:var(--soft);margin:0 0 26px}
+.note{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--accent);padding:14px 18px;margin:0 0 26px;font-size:15.5px;border-radius:0 6px 6px 0}
+.note p:last-child{margin:0}
+figure{margin:0 0 36px}
+figure img{display:block;width:100%;height:auto;border-radius:2px}
+figcaption{font-size:12.5px;color:var(--soft);margin-top:8px}
+nav.pager{display:flex;justify-content:space-between;gap:16px;margin:56px 0 0;padding-top:20px;border-top:1px solid var(--rule);font-size:15px}
+nav.pager a{border:0}
+nav.pager span{display:block;font-size:12px;color:var(--soft);letter-spacing:.1em}
+footer{max-width:760px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-left)) 64px;border-top:1px solid var(--rule);color:var(--soft);font-size:13px}
+@media (max-width:560px){body{font-size:16.5px}pre.log{font-size:12px}}
