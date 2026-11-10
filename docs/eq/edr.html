@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>백신과 EDR | 보안장비 자세히 보기 | AION Tech Blog</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="mast"><div><b>AION Tech Blog</b><span><a href="../index.html">보안은 어떻게 진화했나</a> › <a href="index.html">보안장비 자세히 보기</a></span></div></header>
+<main>
+<p class="kicker">보안장비 자세히 보기 · 7 / 9</p>
+<h1>백신과 EDR</h1>
+<p class="dek">PC와 서버의 안쪽 · 본문 <a href="../index.html#s1">1장</a>(백신), <a href="../index.html#s6">6장</a>(EDR)</p>
+<p class="ask"><small>이 장비가 답하는 질문</small>이 컴퓨터 안에서 어떤 프로그램이 무엇을 했는가</p>
+<ol class="path"><li>사내 업무망</li><li>NAC</li><li class="on">직원 PC · 서버 안 (백신 · EDR)</li><li>DLP</li></ol>
+<article>
+
+<h2>어디에 서 있나</h2>
+<p>앞의 장비들은 네트워크 위에 섰습니다. 백신과 EDR은 PC와 서버 안에 설치하는 프로그램(에이전트)입니다. 에이전트는 기기 안에서 일어나는 일을 보고, 그 결과를 회사의 관리 서버나 클라우드로 보냅니다. 기기가 회사 밖으로 나가도 에이전트는 함께 갑니다. 재택근무자의 노트북처럼 회사 네트워크 장비가 볼 수 없는 기기도 지킬 수 있는 까닭입니다.</p>
+
+<h2>무엇을 보고 판단하나</h2>
+
+<h3>백신: 이 파일이 알려진 악성코드인가</h3>
+<p>백신은 파일을 봅니다. 파일이 디스크에 저장되거나 실행될 때, 이미 알려진 악성코드의 특징(시그니처)이나 지문(해시값)과 맞는지 검사하고, 맞으면 지우거나 격리합니다. 알려진 악성코드에는 빠르고 정확합니다. 처음 보는 악성코드에는 특징이 등록돼 있지 않아 약하고, 악성 파일 없이 윈도에 원래 있는 도구로 공격하면 검사할 파일 자체가 없습니다.</p>
+
+<h3>EDR: 프로그램들이 어떤 순서로 무엇을 했나</h3>
+<p>EDR(Endpoint Detection and Response)은 파일보다 행위를 봅니다. 어떤 프로그램이 실행됐는지, 누가 그것을 띄웠는지(부모 프로세스), 어떤 파일을 만들었는지, 어디로 접속했는지를 계속 기록하고, 그 순서와 관계에서 수상한 모양을 찾습니다.</p>
+<p>예를 들어 직원이 메일로 받은 워드 문서를 열었더니 워드가 파워셸(윈도의 명령 도구)을 띄우고, 그 파워셸이 처음 보는 바깥 주소로 접속했다고 하겠습니다. 워드도 파워셸도 정상 프로그램이라 백신은 반응하지 않을 수 있습니다. 그러나 「문서 프로그램이 명령 도구를 띄웠다」는 관계는 업무에서 거의 일어나지 않습니다. EDR은 이 관계를 보고 경보를 냅니다.</p>
+<p>EDR의 R은 대응입니다. 경보가 나면 관리자는 원격으로 그 PC를 네트워크에서 떼어 내고(격리), 프로세스를 끝내고, 기록을 거슬러 올라가 감염이 어디서 시작됐는지 조사합니다. 기록이 기기 밖에 쌓여 있으므로, 공격자가 PC를 지우더라도 조사할 재료가 남습니다.</p>
+
+<h2>전체 그림에서의 뜻</h2>
+<p>백신은 1980년대 말부터 PC를 지켰습니다. 본문 <a href="../index.html#s6">6장</a>의 시대에 직원이 회사 밖에서 일하고 공격자가 훔친 계정과 정상 도구를 쓰면서, 네트워크 입구의 장비로는 보이지 않는 일이 기기 안에서 늘었습니다. EDR은 감시 지점을 기기 안으로 옮긴 장비입니다. EDR의 탐지를 네트워크, 메일, 클라우드의 탐지와 엮은 것이 XDR이고, 그 대응을 자동으로 돌리는 것이 SOAR입니다.</p>
+
+<h2>로그로 읽기</h2>
+<p>EDR 제품의 로그 형식은 제품마다 다릅니다. 그러나 담는 내용은 윈도가 기본으로 남기는 프로세스 생성 이벤트(보안 로그 4688)와 많이 겹칩니다. 아래는 4688의 칸 이름에 위 워드 → 파워셸 예를 넣은 설명용 예시입니다. 계정, 기기 이름, 시각은 꾸민 값이고, 명령줄 뒷부분은 줄였습니다.</p>
+<pre class="log"><span class="k">EventID</span>             4688  (A new process has been created)
+<span class="k">TimeCreated</span>         2026-11-10T05:12:40Z
+Computer            PC-SALES-031.corp.example
+<span class="k">SubjectUserName</span>     lee.sy
+<span class="k">NewProcessName</span>      C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+<span class="k">CommandLine</span>         powershell.exe -NoProfile -EncodedCommand JABjAGwAaQBlAG4AdAAg...
+<span class="k">ParentProcessName</span>   C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE
+TokenElevationType  %%1938</pre>
+<p class="src">칸 이름과 뜻: Microsoft Learn, 「4688(S): A new process has been created」.</p>
+
+<div class="tbl"><table>
+<tr><th>칸</th><th>예시 값</th><th>읽는 법</th></tr>
+<tr><td><code>TimeCreated</code></td><td>05:12:40Z</td><td>끝의 Z는 세계 표준시(UTC)라는 뜻입니다. 한국 시각으로는 14시 12분 40초입니다. 장비마다 시간대가 다르면 엮을 때 9시간이 어긋납니다.</td></tr>
+<tr><td><code>SubjectUserName</code></td><td>lee.sy</td><td>누가 실행했나.</td></tr>
+<tr><td><code>NewProcessName</code></td><td>…\powershell.exe</td><td>무엇이 실행됐나.</td></tr>
+<tr><td><code>ParentProcessName</code></td><td>…\WINWORD.EXE</td><td>누가 띄웠나. 이 예에서 가장 중요한 칸입니다. 워드가 파워셸을 띄웠습니다.</td></tr>
+<tr><td><code>CommandLine</code></td><td>-EncodedCommand …</td><td>어떤 옵션으로 실행했나. 명령을 인코딩해 숨겼습니다. Microsoft 문서에 따르면 이 칸은 기본으로 비어 있고, 그룹 정책 「Include command line in process creation events」를 켜야 채워집니다. 로그를 설계할 때 미리 켜 두지 않으면 사고 뒤에 볼 수 없습니다.</td></tr>
+<tr><td><code>TokenElevationType</code></td><td>%%1938</td><td>권한 수준. %%1938은 관리자 권한을 뺀 제한된 권한으로 실행됐다는 뜻입니다.</td></tr>
+</table></div>
+
+<h3>더 자세한 기록: Sysmon</h3>
+<p>Microsoft가 무료로 배포하는 Sysmon은 4688보다 많은 것을 남깁니다. Microsoft 문서에 따르면 Sysmon의 프로세스 생성 이벤트(1번)는 실행 파일의 해시값과 부모 프로세스의 명령줄까지 기록하고, 프로세스마다 고유 번호(ProcessGuid)를 붙여 다른 이벤트와 잇게 해 줍니다. 네트워크 연결(3번, 기본은 꺼짐), 파일 생성(11번), DNS 조회(22번)도 남길 수 있습니다. 같은 ProcessGuid로 이으면 「워드가 띄운 파워셸이 어느 도메인을 조회해 어느 주소로 접속했고 어느 폴더에 파일을 떨궜나」가 한 줄로 이어집니다. EDR 제품이 내부에서 하는 일도 이와 비슷합니다.</p>
+
+<h3>이 로그로 답할 수 있는 질문</h3>
+<ul>
+  <li>오피스 프로그램이 명령 도구(파워셸, cmd)를 띄운 일이 있나</li>
+  <li>이 PC에서 처음 보는 실행 파일은 무엇이고, 같은 해시값의 파일이 다른 PC에도 있나</li>
+  <li>임시 폴더나 다운로드 폴더처럼 프로그램이 있을 자리가 아닌 곳에서 실행된 파일이 있나</li>
+  <li>감염된 PC가 처음 연락한 바깥 도메인은 어디인가</li>
+</ul>
+
+<h3>이 로그만으로는 모르는 것</h3>
+<p>에이전트가 없는 기기는 보이지 않습니다. 프린터, 네트워크 장비, 에이전트를 깔지 않은 서버가 그렇습니다. 또 기록 양이 많아서, 무엇을 남길지 고르지 않으면 저장 비용이 커집니다. Microsoft도 Sysmon 문서에서 모듈 적재 이벤트(7번)를 모두 남기면 기록이 매우 많아진다고 경고합니다. 기기 밖의 일, 예를 들어 이 PC의 계정으로 다른 서버에 로그인한 기록은 그 서버와 계정 서버의 로그에 있습니다. 그 기록들을 엮는 곳이 <a href="siem.html">SIEM</a>입니다.</p>
+
+<h2>확인 질문</h2>
+<ol>
+  <li>백신과 EDR은 각각 무엇을 보고 판단하나요?</li>
+  <li>4688 이벤트에서 「워드가 파워셸을 띄웠다」는 사실은 어느 두 칸으로 알 수 있나요?</li>
+</ol>
+
+<h2>더 공부할 것</h2>
+<ul>
+  <li>MITRE ATT&amp;CK의 「실행(Execution)」 전술: 공격자가 정상 도구로 명령을 실행하는 방법들</li>
+  <li>Sysmon을 연습용 PC에 설치하고 이벤트 뷰어에서 1번, 3번 이벤트 읽어 보기</li>
+  <li>원문: <a href="https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-4688">Microsoft, 이벤트 4688</a> · <a href="https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon">Microsoft, Sysmon</a></li>
+</ul>
+
+<nav class="pager"><a href="nac.html"><span>앞 장비</span>네트워크 접근제어(NAC)</a><a href="dlp.html" style="text-align:right"><span>다음 장비</span>자료유출방지(DLP)</a></nav>
+</article>
+</main>
+<footer>아이온퓨처 전략기획팀 · <a href="index.html">보안장비 자세히 보기</a> · <a href="../index.html">본문으로</a></footer>
+</body>
+</html>
