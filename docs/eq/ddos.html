@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>DDoS 대응장비 | 보안장비 자세히 보기 | AION Tech Blog</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="mast"><div><b>AION Tech Blog</b><span><a href="../index.html">보안은 어떻게 진화했나</a> › <a href="index.html">보안장비 자세히 보기</a></span></div></header>
+<main>
+<p class="kicker">보안장비 자세히 보기 · 1 / 9</p>
+<h1>DDoS 대응장비</h1>
+<p class="dek">인터넷 회선이 회사로 들어오는 첫 자리 · 본문 <a href="../index.html#s3">3장</a></p>
+<p class="ask"><small>이 장비가 답하는 질문</small>지금 몰려오는 통신이 정상 사용자의 것인가</p>
+<ol class="path"><li>인터넷</li><li class="on">DDoS 대응장비</li><li>방화벽</li><li>IPS</li><li>웹방화벽 · NAC</li><li>서버 · 직원 PC</li></ol>
+<article>
+
+<h2>어디에 서 있나</h2>
+<p>DDoS 대응장비는 회사의 인터넷 회선이 들어오는 맨 앞, 방화벽보다도 바깥쪽에 섭니다. 방화벽은 세션마다 상태를 기억하기 때문에, 가짜 접속이 수백만 건 몰리면 방화벽의 세션 표부터 가득 찹니다. 그래서 대량 통신을 걸러 내는 장비를 방화벽 앞에 둡니다.</p>
+<p>회사 안의 장비만으로 막을 수 없는 경우도 있습니다. 공격 통신의 양이 회사 회선의 굵기를 넘으면, 장비가 걸러 내기도 전에 회선이 가득 차서 정상 사용자의 통신도 들어오지 못합니다. 이런 공격은 회선을 빌려준 통신사나 대용량 방어 서비스가 회사 회선에 닿기 전에 걸러야 합니다. 그래서 큰 회사와 기관은 회사 안의 장비와 바깥의 방어 서비스를 함께 씁니다.</p>
+
+<h2>무엇을 보고 판단하나</h2>
+
+<h3>공격의 세 갈래</h3>
+<div class="tbl"><table>
+<tr><th>갈래</th><th>무엇을 채우나</th><th>예</th></tr>
+<tr><td>대역폭 공격</td><td>회사 인터넷 회선</td><td>쓸모없는 UDP 통신을 대량으로 보내 회선을 채웁니다.</td></tr>
+<tr><td>연결 자원 공격</td><td>서버와 장비의 연결 표</td><td>SYN 플러드. 아래에서 자세히 봅니다.</td></tr>
+<tr><td>애플리케이션 공격</td><td>웹 서버의 처리 능력</td><td>정상처럼 보이는 웹 페이지 요청을 많은 PC가 동시에 반복합니다. 통신량은 크지 않아도 서버가 응답하느라 지칩니다.</td></tr>
+</table></div>
+
+<h3>SYN 플러드: 반쯤 열린 연결</h3>
+<p>TCP 연결은 세 번 주고받아 맺어집니다. 접속하려는 쪽이 SYN을 보내면, 서버가 SYN-ACK으로 답하고, 접속하는 쪽이 ACK을 보내면 연결이 열립니다. 서버는 SYN을 받은 순간부터 마지막 ACK이 올 때까지 이 연결을 기억해 둡니다. 인터넷 표준 문서 RFC 4987은 SYN 플러드를 이렇게 설명합니다. 공격자는 대개 위조한 출발지 주소로 SYN을 빠르게 쏟아붓고, SYN-ACK에 답하지 않습니다. 반쯤 열린 가짜 연결로 대기열을 채워 두면 정상 사용자의 접속 요청은 거절됩니다.</p>
+
+<h3>장비는 어떻게 가려내나</h3>
+<p>DDoS 대응장비는 먼저 평소의 통신량을 배웁니다. 초당 들어오는 비트 수(bps), 초당 패킷 수(pps), 초당 새 연결 수를 시간대별로 재 두고, 이 기준을 크게 넘으면 공격으로 판단합니다. 공격으로 판단하면 출발지별로 허용하는 양을 제한하거나, SYN에 바로 연결 자원을 내주지 않고 상대가 진짜 응답하는지 먼저 확인하는 방식(RFC 4987이 소개하는 SYN 쿠키 등)으로 가짜 연결을 걸러 냅니다. 장비의 어려움은 정상 사용자가 갑자기 몰리는 날입니다. 대학 수강 신청이나 공연 예매처럼 정상 접속이 폭증하면 공격과 겉모습이 비슷해, 기준을 잘못 잡으면 진짜 손님을 막게 됩니다.</p>
+
+<h2>전체 그림에서의 뜻</h2>
+<p>본문 <a href="../index.html#s0">0장</a>의 세 요소로 보면, DDoS는 정보를 훔치거나 고치지 않고 서비스를 못 쓰게 만드는 공격, 곧 가용성을 깨는 공격입니다. 국내에서는 2009년 7·7 디도스 뒤 정부가 장비가 없던 9개 분야에 대응장비를 추가로 구축하는 예산 200억 원을 편성했습니다(본문 <a href="../index.html#s3">3장</a>). 사고가 예산이 되고, 예산이 이 장비의 구매로 이어진 대표 사례입니다.</p>
+
+<h2>로그로 읽기</h2>
+<p>DDoS 대응에서 가장 많이 쓰는 데이터는 패킷 하나하나보다 흐름 기록(flow record)입니다. 라우터나 대응장비가 「누가 누구에게, 몇 개의 패킷을, 몇 바이트로」 보냈는지를 흐름 단위로 요약해 내보냅니다. 표준 형식인 IPFIX의 칸 이름으로 정상 사용자 한 명과 SYN 플러드 통신을 나란히 놓으면 차이가 보입니다. 값은 설명용 예시이고, 주소는 문서용 예시 주소입니다.</p>
+<div class="tbl"><table>
+<tr><th>IPFIX 칸</th><th>정상 사용자</th><th>SYN 플러드 한 건</th></tr>
+<tr><td><code>sourceIPv4Address</code></td><td>198.51.100.23</td><td>매번 다른 주소(위조)</td></tr>
+<tr><td><code>destinationIPv4Address</code> : <code>destinationTransportPort</code></td><td>203.0.113.10 : 443</td><td>203.0.113.10 : 443</td></tr>
+<tr><td><code>protocolIdentifier</code></td><td>6 (TCP)</td><td>6 (TCP)</td></tr>
+<tr><td><code>tcpControlBits</code></td><td>SYN, ACK, PSH, FIN이 모두 보임</td><td>SYN만 보임</td></tr>
+<tr><td><code>packetDeltaCount</code></td><td>24</td><td>1</td></tr>
+<tr><td><code>octetDeltaCount</code></td><td>18,420</td><td>60</td></tr>
+</table></div>
+<p class="src">칸 이름과 뜻: IANA IPFIX Information Elements 등록부. 예: <code>tcpControlBits</code>는 「이 흐름의 패킷들에서 관측된 TCP 제어 비트」입니다.</p>
+<p>정상 사용자의 흐름에는 연결을 열고(SYN), 주고받고(ACK·PSH), 닫는(FIN) 표시가 모두 있고 패킷도 여러 개입니다. SYN 플러드의 흐름은 SYN 패킷 한 개로 끝납니다. 이런 흐름이 서로 다른 출발지 수만 개에서 한 목적지로 몰리는 모습이 SYN 플러드의 로그 모양입니다.</p>
+<p>대응장비는 이 흐름을 보고 공격 사건 기록을 따로 남깁니다. 칸 이름은 제품마다 다르지만 보통 공격 시작과 끝 시각, 대상 주소와 포트, 공격 유형, 최대 bps와 pps, 걸러 낸 양과 통과시킨 양이 들어갑니다.</p>
+
+<h3>이 로그로 답할 수 있는 질문</h3>
+<ul>
+  <li>공격은 언제 시작해 얼마나 이어졌고, 가장 많을 때 양은 얼마였나</li>
+  <li>어느 서비스(주소·포트)가 대상이었나</li>
+  <li>걸러 내는 동안 정상 사용자의 접속은 얼마나 막혔나. 통과시킨 양과 서비스 응답 시간을 함께 봅니다.</li>
+  <li>회선과 장비 용량을 얼마나 늘려야 다음 공격을 견디나</li>
+</ul>
+
+<h3>이 로그만으로는 모르는 것</h3>
+<p>누가 공격을 시켰는지는 이 로그로 알기 어렵습니다. 출발지 주소는 위조됐거나, 주인도 모르게 감염된 좀비 PC와 기기의 것입니다. 또 공격이 이어지는 동안 <a href="ips.html">IPS</a>나 <a href="waf.html">웹방화벽</a>에 다른 경보가 함께 올라오는지 <a href="siem.html">SIEM</a>에서 같이 봐야 합니다. 관제 인력이 대량 통신에 매달린 사이 다른 침입 경보가 묻힐 수 있습니다.</p>
+
+<h2>확인 질문</h2>
+<ol>
+  <li>DDoS 대응장비를 방화벽보다 바깥에 두는 까닭은 무엇인가요?</li>
+  <li>흐름 기록에서 SYN 플러드를 정상 접속과 가르는 칸은 무엇이고, 값이 어떻게 다른가요?</li>
+</ol>
+
+<h2>더 공부할 것</h2>
+<ul>
+  <li>TCP 연결이 맺어지고 끊기는 과정(3단계 연결, 4단계 종료)</li>
+  <li>반사·증폭 공격: 작은 요청에 큰 응답을 돌려주는 서버를 악용하는 방식</li>
+  <li>원문: <a href="https://www.rfc-editor.org/rfc/rfc4987.html">RFC 4987, TCP SYN Flooding Attacks and Common Mitigations</a>(2007년 8월) · <a href="https://www.iana.org/assignments/ipfix/ipfix.xhtml">IANA, IPFIX Information Elements</a></li>
+</ul>
+
+<nav class="pager"><a href="index.html"><span>처음으로</span>보안장비 자세히 보기</a><a href="firewall.html" style="text-align:right"><span>다음 장비</span>방화벽</a></nav>
+</article>
+</main>
+<footer>아이온퓨처 전략기획팀 · <a href="index.html">보안장비 자세히 보기</a> · <a href="../index.html">본문으로</a></footer>
+</body>
+</html>
