@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>자료유출방지(DLP) | 보안장비 자세히 보기 | AION Tech Blog</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="mast"><div><b>AION Tech Blog</b><span><a href="../index.html">보안은 어떻게 진화했나</a> › <a href="index.html">보안장비 자세히 보기</a></span></div></header>
+<main>
+<p class="kicker">보안장비 자세히 보기 · 8 / 9</p>
+<h1>자료유출방지(DLP)</h1>
+<p class="dek">자료가 회사 밖으로 나가는 길목 · 본문 <a href="../index.html#s5">5장</a></p>
+<p class="ask"><small>이 장비가 답하는 질문</small>이 자료가 이 길로 회사 밖에 나가도 되는가</p>
+<ol class="path"><li>직원 PC</li><li class="on">DLP</li><li>메일 · 웹 업로드 · USB · 출력</li><li>회사 밖</li></ol>
+<article>
+
+<h2>어디에 서 있나</h2>
+<p>앞의 장비들은 대부분 들어오는 것을 봤습니다. DLP는 나가는 자료를 봅니다. 자료가 회사 밖으로 나가는 길은 여럿이라, DLP도 여러 자리에 나눠 섭니다. 메일 서버 앞에서 보내는 메일과 첨부를, 웹 프록시에서 웹으로 올리는 파일을, PC 에이전트로 USB 저장장치 복사와 출력과 메신저 전송을 봅니다. 클라우드 업무 서비스 안의 자료를 보는 제품도 있습니다.</p>
+
+<h2>무엇을 보고 판단하나</h2>
+
+<h3>내용을 읽는다</h3>
+<p>DLP는 파일의 내용을 열어 봅니다. 판단하는 방식은 크게 넷입니다.</p>
+<div class="tbl"><table>
+<tr><th>방식</th><th>무엇을 찾나</th><th>예</th></tr>
+<tr><td>패턴</td><td>정해진 꼴의 문자열</td><td>주민등록번호(생년월일 6자리-7자리), 카드번호, 계좌번호</td></tr>
+<tr><td>키워드</td><td>지정한 낱말</td><td>「대외비」, 개발 중인 제품의 내부 이름</td></tr>
+<tr><td>문서 지문</td><td>미리 등록한 기밀 문서와 닮은 정도</td><td>설계 문서의 일부만 잘라 붙여도 찾아냅니다.</td></tr>
+<tr><td>등급 표시</td><td>문서에 붙은 보안 등급 표시</td><td>작성자가 「사내 한정」으로 표시한 문서</td></tr>
+</table></div>
+
+<h3>정책: 무엇이, 어느 길로, 얼마나</h3>
+<p>DLP 정책은 「무엇이 · 어느 길로 · 얼마나 · 누가」의 조합에 동작을 붙입니다. 예를 들면 「주민등록번호가 100건 이상 든 파일을 USB로 복사하면 차단」, 「협력사 메일 주소로 대외비 문서를 보내면 팀장 승인 뒤 발송」, 「개인 클라우드 저장소 업로드는 기록만」처럼 씁니다. 모두 막으면 업무가 멈추기 때문에, 사용자가 사유를 적으면 허용하고 그 사유를 나중에 점검하는 방식을 많이 씁니다.</p>
+
+<h3>못 읽는 자료</h3>
+<p>암호를 건 압축 파일이나 암호화된 문서는 DLP가 내용을 열 수 없습니다. 화면을 이미지로 캡처한 자료도 글자 검사가 어렵습니다. 그래서 「내용을 검사할 수 없는 파일의 반출」 자체를 정책으로 다루는 경우가 많습니다.</p>
+
+<h2>전체 그림에서의 뜻</h2>
+<p>본문 <a href="../index.html#s5">5장</a>의 2014년 카드 3사 사건에서 고객정보 1억여 건을 빼낸 사람은 권한을 가진 협력업체 직원이었습니다. 입구를 지키는 장비들은 권한을 가진 사람이 정상 경로로 자료를 들고 나가는 일을 보지 않습니다. DLP는 그 나가는 쪽을 지킵니다.</p>
+
+<h2>로그로 읽기</h2>
+<p>DLP 로그는 제품마다 칸 이름이 크게 다르므로, 아래는 칸의 뜻을 설명하려고 만든 예시입니다. 사람, 파일, 숫자는 모두 꾸민 값입니다.</p>
+<pre class="log"><span class="k">시각</span>       2026-11-10 18:42:07
+<span class="k">사용자</span>     lee.sy (영업2팀)
+<span class="k">단말</span>       PC-SALES-031 / 10.0.20.31
+<span class="k">경로</span>       USB 저장장치
+<span class="k">파일</span>       고객명단_2026.xlsx (1.2MB)
+<span class="k">걸린 정책</span>  개인정보-주민등록번호 100건 이상
+<span class="k">검출 수</span>    1,284건
+<span class="k">동작</span>       차단 → 사용자 사유 입력 뒤 재요청
+<span class="k">사유</span>       "외부 행사 참가자 등록"</pre>
+<div class="tbl"><table>
+<tr><th>칸</th><th>읽는 법</th></tr>
+<tr><td>사용자 · 단말</td><td>누가, 어느 기기에서. DLP는 에이전트가 기기 안에 있어 계정 이름을 직접 압니다.</td></tr>
+<tr><td>경로</td><td>어느 길로 나가려 했나. 메일, 웹 업로드, USB, 출력 가운데 어느 길이 많이 쓰이는지가 정책을 고칠 근거가 됩니다.</td></tr>
+<tr><td>걸린 정책 · 검출 수</td><td>무엇이 얼마나 들어 있었나. 주민등록번호 3건과 1,284건은 같은 경보라도 무게가 다릅니다.</td></tr>
+<tr><td>동작 · 사유</td><td>어떻게 처리했나. 사유를 적고 허용된 건은 나중에 사유가 타당했는지 점검할 대상입니다.</td></tr>
+</table></div>
+
+<h3>함께 보는 기록: 개인정보처리시스템 접속기록</h3>
+<p>DLP가 나가는 길목을 본다면, 그 자료가 처음 어디서 나왔는지는 고객 정보를 다루는 시스템의 접속기록이 압니다. 「개인정보의 안전성 확보조치 기준」(개인정보보호위원회 고시 제2026-9호, 2026년 7월 1일 시행) 제8조는 개인정보처리시스템에 접속한 사람의 접속기록을 1년 이상 보관하게 하고, 5만 명 이상의 개인정보나 고유식별정보·민감정보를 처리하는 시스템 등은 2년 이상 보관하게 합니다. 같은 조는 접속기록과 개인정보 다운로드 상황을 확인하고 점검하는 주기, 방법, 사후 조치 절차를 내부 관리계획으로 정해 이행하게 합니다. 고객 시스템에서 18시 30분에 1,284명분을 내려받은 기록과, 18시 42분에 같은 사람이 같은 건수의 파일을 USB로 옮기려 한 DLP 기록을 나란히 놓으면 한 사건이 됩니다.</p>
+
+<h3>이 로그로 답할 수 있는 질문</h3>
+<ul>
+  <li>차단된 반출 시도가 가장 많은 사람과 부서는 어디인가</li>
+  <li>사유를 적고 허용된 반출 가운데 사유가 업무와 맞지 않는 건은 무엇인가</li>
+  <li>퇴사를 앞둔 사람의 반출이 최근 늘었나</li>
+  <li>업무 시간 밖에 큰 파일이 나간 일이 있나</li>
+</ul>
+
+<h3>이 로그만으로는 모르는 것</h3>
+<p>휴대폰으로 화면을 찍거나, 회사가 관리하지 않는 개인 기기로 옮긴 자료는 DLP가 보지 못합니다. 또 DLP는 「나가려 한 순간」만 압니다. 그 사람이 평소에도 이만큼 자료를 다뤘는지, 이번이 처음인지는 사람별 평소 행동과 견줘야 보입니다. 이 비교를 맡는 분석이 본문 5장의 UEBA이고, 여러 기록을 모아 놓는 자리가 <a href="siem.html">SIEM</a>입니다.</p>
+
+<h2>확인 질문</h2>
+<ol>
+  <li>DLP가 내용을 검사할 수 없는 자료에는 어떤 것이 있고, 회사는 이를 어떻게 다루나요?</li>
+  <li>개인정보처리시스템 접속기록은 몇 년 이상 보관해야 하고, 2년 이상 보관해야 하는 경우는 어떤 때인가요?</li>
+</ol>
+
+<h2>더 공부할 것</h2>
+<ul>
+  <li>문서 등급 분류 체계와 정보 자산 목록</li>
+  <li>개인정보 보호법과 안전성 확보조치 기준의 접속기록·암호화 조항</li>
+  <li>원문: <a href="https://www.law.go.kr/LSW//admRulSideInfoP.do?admRulSeq=2100000281400&amp;chrClsCd=010201&amp;joNo=0008&amp;joBrNo=00&amp;dashNo=&amp;docCls=jo&amp;urlMode=admRulScJoRltInfoR">국가법령정보센터, 개인정보의 안전성 확보조치 기준 제8조</a></li>
+</ul>
+
+<nav class="pager"><a href="edr.html"><span>앞 장비</span>백신과 EDR</a><a href="siem.html" style="text-align:right"><span>다음 장비</span>SIEM과 보안관제</a></nav>
+</article>
+</main>
+<footer>아이온퓨처 전략기획팀 · <a href="index.html">보안장비 자세히 보기</a> · <a href="../index.html">본문으로</a></footer>
+</body>
+</html>
