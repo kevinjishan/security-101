@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>침입탐지·방지시스템(IDS·IPS) | 보안장비 자세히 보기 | AION Tech Blog</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="mast"><div><b>AION Tech Blog</b><span><a href="../index.html">보안은 어떻게 진화했나</a> › <a href="index.html">보안장비 자세히 보기</a></span></div></header>
+<main>
+<p class="kicker">보안장비 자세히 보기 · 3 / 9</p>
+<h1>침입탐지·방지시스템<br>(IDS·IPS)</h1>
+<p class="dek">허용된 문 안쪽 · 본문 <a href="../index.html#s3">3장</a></p>
+<p class="ask"><small>이 장비가 답하는 질문</small>허용된 이 통신 안에 알려진 공격이 들어 있는가</p>
+<ol class="path"><li>인터넷</li><li>DDoS 대응장비</li><li>방화벽</li><li class="on">IPS</li><li>웹방화벽 · NAC</li><li>서버 · 직원 PC</li></ol>
+<article>
+
+<h2>어디에 서 있나</h2>
+<p>IPS는 방화벽 바로 뒤, 통신이 반드시 지나가는 길목에 섭니다. 길목에 서 있으므로 공격을 찾으면 그 통신을 바로 끊을 수 있습니다. IDS는 길목에 서지 않고, 스위치가 복사해 주는 통신 사본을 옆에서 봅니다. 통신을 늦추거나 끊을 위험이 없는 대신, 공격을 찾아도 알리기만 합니다. 요즘은 별도 장비 대신 NGFW나 UTM 안의 기능으로 들어가는 경우도 많습니다. 미국 NIST는 둘을 묶어 IDPS라고 부르고 2007년 지침(SP 800-94)으로 정리했습니다.</p>
+
+<h2>무엇을 보고 판단하나</h2>
+
+<h3>시그니처: 알려진 공격의 생김새</h3>
+<p>IPS의 기본 무기는 시그니처입니다. 시그니처는 이미 알려진 공격이 통신 안에 남기는 특징을 규칙 한 줄로 적은 것입니다. 공개 IDS·IPS인 Suricata의 규칙으로 구조를 보면 이렇습니다. 아래 규칙은 설명을 위해 만든 연습용입니다.</p>
+<pre class="log"><span class="k">alert</span> tcp $EXTERNAL_NET any -&gt; $HOME_NET 23 (<span class="k">msg</span>:"외부에서 텔넷 접속 시도"; flow:to_server; <span class="k">sid</span>:1000001; <span class="k">rev</span>:1;)</pre>
+<div class="tbl"><table>
+<tr><th>부분</th><th>뜻</th></tr>
+<tr><td><code>alert</code></td><td>동작. 맞으면 경보만 남깁니다. IPS로 쓸 때 <code>drop</code>을 적으면 그 통신을 버립니다.</td></tr>
+<tr><td><code>tcp $EXTERNAL_NET any -&gt; $HOME_NET 23</code></td><td>머리. 바깥 어디에서든 회사 안의 23번 포트(텔넷)로 가는 TCP 통신에만 이 규칙을 적용합니다.</td></tr>
+<tr><td><code>msg</code></td><td>경보에 찍힐 설명.</td></tr>
+<tr><td><code>flow:to_server</code></td><td>조건. 서버 쪽으로 가는 방향만 봅니다. 실제 규칙에는 여기에 「통신 안에 이 문자열이 있으면」 같은 내용 조건이 붙습니다.</td></tr>
+<tr><td><code>sid</code> <code>rev</code></td><td>규칙 번호와 고친 횟수. 아래 경보 로그에 그대로 찍혀, 어느 규칙이 울렸는지 거꾸로 찾을 때 씁니다.</td></tr>
+</table></div>
+<p>회사가 규칙을 모두 직접 쓰지는 않습니다. 장비 제조사나 보안업체가 새 공격이 알려질 때마다 규칙 묶음을 갱신해 내려 주고, 회사는 그중 무엇을 켜고 끌지 정합니다.</p>
+
+<h3>오탐과 미탐</h3>
+<p>시그니처는 알려진 공격만 찾습니다. 처음 보는 공격은 규칙이 없으므로 지나갑니다(미탐). 반대로 규칙이 너무 넓으면 정상 통신이 공격처럼 걸립니다(오탐). IPS 운영의 상당 부분은 우리 회사 환경에서 오탐을 많이 내는 규칙을 고르고, 꼭 막아야 할 규칙은 차단으로 돌리는 조정(튜닝) 작업입니다. 차단으로 둔 규칙이 오탐을 내면 정상 업무 통신이 끊기기 때문에, 처음에는 경보만 내게 두고 지켜본 뒤 차단으로 바꾸는 순서를 흔히 밟습니다.</p>
+
+<h3>암호화된 통신</h3>
+<p>HTTPS처럼 암호화된 통신은 IPS가 내용을 볼 수 없습니다. 내용을 보려면 장비가 암호를 풀었다가 다시 씌워 보내는 복호화 기능을 따로 써야 합니다. 웹 서비스로 들어오는 암호화 통신은 웹 서버 바로 앞의 <a href="waf.html">웹방화벽</a>이 서버 인증서로 풀어서 검사하는 경우가 많습니다.</p>
+
+<h2>전체 그림에서의 뜻</h2>
+<p>방화벽은 「이 문을 열어도 되나」만 봤습니다. IPS는 열린 문으로 들어오는 통신의 내용을 처음으로 들여다본 장비입니다. 2000년대에 웜과 웹 해킹이 열어 둔 포트로 들어오면서 필요해졌습니다. IPS가 남긴 한계는 둘입니다. 알려진 공격만 찾는다는 것, 그리고 경보가 많다는 것입니다. 앞의 한계는 샌드박스와 행위 분석으로, 뒤의 한계는 경보를 모아 엮는 ESM과 <a href="siem.html">SIEM</a>으로 이어졌습니다.</p>
+
+<h2>로그로 읽기</h2>
+<p>IPS 로그는 경보입니다. 아래는 Suricata 공식 문서에 실린 EVE(JSON) 형식 경보 예시에서 이 장에서 읽을 칸만 발췌한 것입니다. 원문에 있는 <code>metadata.flowbits</code>, <code>tx_id</code>, <code>app_proto</code> 등은 뺐습니다. 남긴 칸의 값은 원문 그대로입니다.</p>
+<pre class="log">{
+  "<span class="k">timestamp</span>": "2017-04-07T22:24:37.251547+0100",
+  "<span class="k">flow_id</span>": 586497171462735,
+  "pcap_cnt": 53381,
+  "<span class="k">event_type</span>": "alert",
+  "<span class="k">src_ip</span>": "192.168.2.14",
+  "src_port": 50096,
+  "<span class="k">dest_ip</span>": "209.53.113.5",
+  "<span class="k">dest_port</span>": 80,
+  "proto": "TCP",
+  "alert": {
+    "<span class="k">action</span>": "allowed",
+    "gid": 1,
+    "<span class="k">signature_id</span>": 2018358,
+    "rev": 10,
+    "<span class="k">signature</span>": "ET HUNTING GENERIC SUSPICIOUS POST to Dotted Quad with Fake Browser 1",
+    "<span class="k">category</span>": "Potentially Bad Traffic",
+    "<span class="k">severity</span>": 2
+  }
+}</pre>
+<p class="src">출처: Suricata 문서, 「EVE JSON Format」의 alert 예시에서 일부 발췌.</p>
+
+<div class="tbl"><table>
+<tr><th>칸</th><th>이 로그의 값</th><th>읽는 법</th></tr>
+<tr><td><code>timestamp</code></td><td>2017-04-07 22:24:37 (+01:00)</td><td>언제. 시간대(+0100)가 함께 적혀 있습니다. 한국 시각(+0900) 장비와 엮을 때는 시간대를 맞춰야 합니다.</td></tr>
+<tr><td><code>src_ip</code> → <code>dest_ip</code></td><td>192.168.2.14 → 209.53.113.5:80</td><td>내부 PC가 바깥 웹 서버로 보낸 통신에서 울렸습니다. 공격이 밖에서만 오지 않는다는 것을 이 방향이 보여 줍니다.</td></tr>
+<tr><td><code>signature_id</code> <code>signature</code></td><td>2018358, 「…Fake Browser…」</td><td>어느 규칙이 울렸나. 도메인 이름 대신 숫자 IP 주소로, 가짜 브라우저 이름을 달고 POST 요청을 보냈다는 규칙입니다. 이름의 「HUNTING」은 확정된 공격보다 더 들여다볼 통신을 잡는 규칙이라는 표시입니다.</td></tr>
+<tr><td><code>category</code> <code>severity</code></td><td>Potentially Bad Traffic, 2</td><td>분류와 무게. Suricata에서는 숫자가 작을수록 무겁습니다. 관제에서는 이 값으로 먼저 볼 경보를 고릅니다.</td></tr>
+<tr><td><code>action</code></td><td>allowed</td><td>통신을 막았나. 문서에 따르면 IPS 모드에서 <code>drop</code> 규칙이나 <code>reject</code> 규칙에 걸렸을 때만 <code>blocked</code>가 되고, 나머지는 <code>allowed</code>입니다. 이 경보는 알리기만 하고 통신은 지나갔습니다.</td></tr>
+<tr><td><code>flow_id</code></td><td>586497171462735</td><td>같은 통신 흐름의 다른 기록(세션 기록, HTTP 기록)을 이어 붙이는 번호.</td></tr>
+</table></div>
+
+<h3>이 로그로 답할 수 있는 질문</h3>
+<ul>
+  <li>어느 출발지가 어떤 종류의 공격을 몇 번 시도했나</li>
+  <li>회사 안의 어느 PC가 바깥으로 수상한 통신을 보내고 있나(위 예시처럼 안→밖 방향 경보)</li>
+  <li>어느 규칙이 오탐을 많이 내나. <code>signature_id</code>별로 세어 보면 튜닝할 규칙이 드러납니다.</li>
+</ul>
+
+<h3>이 로그만으로는 모르는 것</h3>
+<p>경보는 공격 <b>시도</b>를 봤다는 기록이지, 공격이 <b>성공</b>했다는 기록이 아닙니다. 웹 해킹 경보가 울렸다면 서버가 어떻게 응답했는지(<a href="waf.html">웹방화벽</a>이나 웹 서버 로그의 응답 코드), 서버 안에서 새 프로그램이 실행됐는지(<a href="edr.html">EDR</a> 로그)를 이어서 봐야 성공 여부를 판단할 수 있습니다. 이 확인을 경보마다 사람이 하는 것이 보안관제의 일이고, 경보가 많을수록 이 일이 밀립니다. 본문 <a href="../index.html#s7">7장</a>의 AI SOC가 이 앞부분을 맡으려는 시도입니다.</p>
+
+<h2>확인 질문</h2>
+<ol>
+  <li>IDS와 IPS는 서 있는 자리가 어떻게 다르고, 그 차이 때문에 할 수 있는 일이 어떻게 달라지나요?</li>
+  <li>IPS 경보가 울렸다는 사실만으로 공격이 성공했다고 말할 수 없는 까닭은 무엇인가요?</li>
+</ol>
+
+<h2>더 공부할 것</h2>
+<ul>
+  <li>Suricata를 직접 설치해 공개 규칙 묶음을 켜고, 연습용 통신을 흘려 경보가 찍히는 것을 보기</li>
+  <li>네트워크 IPS와 호스트 IPS의 차이</li>
+  <li>원문: <a href="https://csrc.nist.gov/pubs/sp/800/94/final">NIST SP 800-94, IDPS 지침</a>(2007년 2월) · <a href="https://docs.suricata.io/en/latest/output/eve/eve-json-format.html">Suricata, EVE JSON Format</a></li>
+</ul>
+
+<nav class="pager"><a href="firewall.html"><span>앞 장비</span>방화벽</a><a href="waf.html" style="text-align:right"><span>다음 장비</span>웹방화벽(WAF)</a></nav>
+</article>
+</main>
+<footer>아이온퓨처 전략기획팀 · <a href="index.html">보안장비 자세히 보기</a> · <a href="../index.html">본문으로</a></footer>
+</body>
+</html>
