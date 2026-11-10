@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>SIEM과 보안관제 | 보안장비 자세히 보기 | AION Tech Blog</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="mast"><div><b>AION Tech Blog</b><span><a href="../index.html">보안은 어떻게 진화했나</a> › <a href="index.html">보안장비 자세히 보기</a></span></div></header>
+<main>
+<p class="kicker">보안장비 자세히 보기 · 9 / 9</p>
+<h1>SIEM과 보안관제</h1>
+<p class="dek">모든 장비의 기록이 모이는 곳 · 본문 <a href="../index.html#s4">4장</a>(ESM·SOC), <a href="../index.html#s5">5장</a>(SIEM), <a href="../index.html#s7">7장</a>(AI SOC)</p>
+<p class="ask"><small>이 장비가 답하는 질문</small>흩어진 기록을 이어 붙이면 무슨 일이 있었는가</p>
+<ol class="path"><li>DDoS · 방화벽 · IPS · 웹방화벽</li><li>VPN · NAC · EDR · DLP · 서버</li><li class="on">SIEM</li><li>보안관제센터(SOC)</li></ol>
+<article>
+
+<h2>어디에 서 있나</h2>
+<p>SIEM은 통신의 길목에 서지 않습니다. 배치도 맨 아래 띠처럼, 앞의 여덟 장비와 서버, 계정 서버, 업무 시스템이 남긴 로그를 한곳으로 받습니다. 네트워크 장비는 대개 syslog라는 표준 방식으로 로그를 보내고, 서버와 PC는 설치한 수집 프로그램(에이전트)이, 클라우드 서비스는 제공 업체의 API가 로그를 넘깁니다. SIEM 화면을 24시간 지켜보고 판단하는 조직이 보안관제센터(SOC)입니다.</p>
+
+<h2>무엇을 하나: 다섯 단계</h2>
+<div class="tbl"><table>
+<tr><th>단계</th><th>하는 일</th></tr>
+<tr><td>1. 수집</td><td>장비마다 다른 길(syslog, 에이전트, API)로 로그를 받습니다.</td></tr>
+<tr><td>2. 해석과 정규화</td><td>로그 한 줄을 칸으로 나누고, 장비마다 다른 칸 이름을 같은 이름으로 맞춥니다. 시각도 한 시간대로 맞춥니다.</td></tr>
+<tr><td>3. 저장과 검색</td><td>정해진 기간 동안 보관하고, 「이 주소가 지난 석 달 동안 한 일」을 몇 초 안에 찾게 합니다.</td></tr>
+<tr><td>4. 상관분석</td><td>서로 다른 장비의 기록을 시각, 주소, 계정으로 엮어 하나의 사건으로 묶고, 미리 정한 조건(룰)에 맞으면 경보를 냅니다.</td></tr>
+<tr><td>5. 관제와 대응</td><td>관제 인력이 경보를 확인하고 분석해 진짜 공격인지 판정한 뒤, 대응하고 보고합니다.</td></tr>
+</table></div>
+
+<h3>정규화: 같은 뜻, 다른 이름</h3>
+<p>이 시리즈에서 본 로그만 모아도, 같은 뜻의 칸이 장비마다 다른 이름으로 찍힙니다.</p>
+<div class="tbl"><table>
+<tr><th>뜻</th><th><a href="firewall.html">방화벽</a><br>(FortiGate)</th><th><a href="ips.html">IPS</a><br>(Suricata)</th><th>윈도 로그인<br>(4625·4624)</th><th><a href="vpn.html">VPN</a><br>(RADIUS)</th></tr>
+<tr><td>출발지 주소</td><td><code>srcip</code></td><td><code>src_ip</code></td><td><code>IpAddress</code></td><td><code>Framed-IP-Address</code></td></tr>
+<tr><td>사용자</td><td>(이 표본에는 없음)</td><td>(없음)</td><td><code>TargetUserName</code></td><td><code>User-Name</code></td></tr>
+<tr><td>성공·실패</td><td><code>action</code></td><td><code>alert.action</code></td><td>이벤트 번호<br>(4624 성공 · 4625 실패)</td><td>(이 회계 기록에는 없음)</td></tr>
+<tr><td>실패 까닭</td><td>(없음)</td><td>(없음)</td><td>4625의 <code>Status</code>·<code>SubStatus</code></td><td>(없음)</td></tr>
+<tr><td>접속의 시작·끝</td><td>(없음)</td><td>(없음)</td><td>(없음)</td><td><code>Acct-Status-Type</code><br>(Start · Stop)</td></tr>
+<tr><td>시각</td><td><code>date</code>+<code>time</code><br>(장비 설정 시간대)</td><td><code>timestamp</code><br>(시간대 표기)</td><td><code>TimeCreated</code><br>(UTC)</td><td>기록 시각</td></tr>
+</table></div>
+<p>정규화하지 않으면 「출발지가 10.200.0.15인 모든 기록」을 찾으려고 장비마다 다른 검색을 네 번 해야 합니다. 시각도 그대로 두면 윈도 로그(UTC)와 국내 장비 로그(한국 시각)가 9시간 어긋나서, 같은 순간의 일이 서로 다른 시각의 일로 보입니다. SIEM 구축 작업의 상당 부분이 이 칸 맞추기입니다. 수집할 장비와 칸을 정하면 나중에 무엇을 볼 수 있을지가 그때 정해집니다.</p>
+
+<h2>로그로 읽기: 한 사건을 이어 붙이기</h2>
+<p>아래는 앞 장들에서 본 로그 형식으로 꾸민 사건입니다. 계정, 주소, 시각은 모두 설명용입니다. 장비마다 하나씩 떼어 보면 어느 것도 확실한 공격으로 보이지 않습니다.</p>
+<div class="tbl"><table>
+<tr><th>시각</th><th>어느 로그</th><th>무엇이 찍혔나</th><th>이것만 보면</th></tr>
+<tr><td>01:58</td><td><a href="vpn.html">VPN</a></td><td><code>User-Name</code>=kim.jh, 해외 주소에서 접속, <code>Framed-IP-Address</code>=10.200.0.15</td><td>출장 중일 수 있습니다.</td></tr>
+<tr><td>02:10~02:14</td><td>파일 서버 윈도 4625</td><td>로그인 실패 37건, <code>TargetUserName</code>=svc_backup, <code>IpAddress</code>=10.200.0.15, <code>SubStatus</code>=0xC000006A</td><td>누가 비밀번호를 여러 번 틀렸습니다.</td></tr>
+<tr><td>02:15</td><td>파일 서버 윈도 4624</td><td>svc_backup 로그인 성공, 출발지 10.200.0.15</td><td>정상 로그인으로 보입니다.</td></tr>
+<tr><td>02:21</td><td><a href="edr.html">EDR</a>(4688)</td><td>파일 서버에서 powershell.exe 실행, 계정 svc_backup</td><td>관리 작업일 수 있습니다.</td></tr>
+<tr><td>02:33</td><td><a href="firewall.html">방화벽</a></td><td>파일 서버 → 바깥 203.0.113.200:443, <code>sentbyte</code> 약 2.1GB, <code>action</code>=close</td><td>백업 전송일 수 있습니다.</td></tr>
+</table></div>
+<p>정규화를 거치면 다섯 줄이 주소 10.200.0.15와 계정 svc_backup으로 이어집니다. VPN 기록이 10.200.0.15를 kim.jh로 바꿔 주므로, 사건은 이렇게 읽힙니다. 새벽 2시 전에 kim.jh 계정이 해외에서 VPN으로 들어왔습니다. 그 자리에서 파일 서버의 백업용 관리 계정 비밀번호를 37번 대입해 맞혔고, 그 계정으로 명령 도구를 띄운 뒤, 서버에서 바깥으로 2GB를 내보냈습니다. 빼앗긴 직원 계정이 내부 서버의 자료 유출로 이어진 사건입니다.</p>
+<p>Microsoft 문서는 4625의 <code>SubStatus</code> 0xC000006A를 잘못된 비밀번호로 인한 실패로 풀고, 이런 실패가 연달아 나오는지 특히 살피라고 권합니다. 이 권고를 SIEM 룰로 옮기면 이렇게 적을 수 있습니다.</p>
+<div class="note"><p>같은 출발지 주소에서 5분 안에 로그인 실패가 20번을 넘고, 이어서 같은 계정의 로그인 성공이 나오면 경보. 그 출발지가 VPN이 빌려준 주소이면, 그 시각의 VPN 사용자 이름과 접속해 온 나라를 경보에 붙인다.</p></div>
+<p>5분과 20번은 회사마다 평소 기록을 보고 정합니다. 너무 낮으면 비밀번호를 몇 번 틀린 직원마다 경보가 울리고, 너무 높으면 천천히 시도하는 공격을 놓칩니다.</p>
+
+<h3>관제 인력이 경보 하나를 받으면</h3>
+<p>위 룰이 02:15에 경보를 냈다고 하겠습니다. 관제 인력은 경보에 붙은 정보를 확인하고, 같은 주소와 계정의 앞뒤 기록을 검색합니다. kim.jh가 실제로 해외 출장 중인지 본인과 담당 부서에 확인하고, 파일 서버에서 그 뒤에 실행된 프로그램과 바깥 통신을 찾습니다. 공격으로 판정하면 VPN 계정을 막고, EDR로 파일 서버를 격리하고, 방화벽에서 바깥 주소를 차단한 뒤 보고합니다. 본문 <a href="../index.html#s7">7장</a>의 AI SOC 에이전트는 이 가운데 앞뒤 기록을 찾아 붙이고 1차 판단을 정리하는 부분을 맡으려 합니다.</p>
+
+<h2>전체 그림에서의 뜻</h2>
+<p>본문 <a href="../index.html#s0">0장</a> 그림의 점선, 곧 장비가 늘면 그 장비들의 기록을 관리하는 일이 생긴다는 곁가지 순환이 SIEM과 보안관제입니다. 2000년대 중반의 ESM은 보안장비의 이벤트를 모아 묶었고(본문 4장), SIEM은 서버, 업무 시스템, 계정 서버까지 모을 수 있는 로그를 모두 모으는 쪽으로 넓어졌습니다(본문 5장). 앞의 여덟 장비는 저마다 통신, 기기, 자료를 판단합니다. SIEM은 그 판단들을 시간 순서로 이어 사건으로 만듭니다.</p>
+
+<h3>SIEM이 못 보는 것</h3>
+<p>SIEM은 받은 로그만 압니다. 수집하지 않은 장비, 켜 두지 않은 칸은 사고가 난 뒤에도 볼 수 없습니다. 위 사건에서 VPN 로그를 모으지 않았다면 10.200.0.15가 누구인지 알 수 없고, 윈도의 명령줄 기록을 켜 두지 않았다면 파워셸이 무엇을 했는지 알 수 없습니다. 보관 기간도 같습니다. 공격자가 몇 달 동안 숨어 있다 드러나면(본문 5장 농협 사건은 일곱 달이었습니다) 그만큼 거슬러 올라갈 기록이 남아 있어야 합니다. 개인정보처리시스템의 접속기록은 법령으로 1년 또는 2년 이상 보관해야 합니다(<a href="dlp.html">DLP</a> 편 참고).</p>
+
+<h2>확인 질문</h2>
+<ol>
+  <li>정규화를 하지 않으면 위 사건을 찾는 데 어떤 어려움이 생기나요? 칸 이름과 시각 두 가지로 설명해 보십시오.</li>
+  <li>위 사건에서 VPN 로그는 어떤 역할을 했나요?</li>
+</ol>
+
+<h2>더 공부할 것</h2>
+<ul>
+  <li>로그 수집 설계: 무엇을 모을지, 얼마나 보관할지, 비용은 얼마인지</li>
+  <li>MITRE ATT&amp;CK으로 룰을 정리하는 법: 이 룰이 공격의 어느 단계를 잡는가</li>
+  <li>관제 업무 흐름: 경보 분류, 오탐 관리, 대응 절차서(플레이북)</li>
+  <li>원문: <a href="https://csrc.nist.gov/pubs/sp/800/92/final">NIST SP 800-92, 보안 로그 관리 지침</a>(2006년 9월) · <a href="https://www.rfc-editor.org/rfc/rfc5424.html">RFC 5424, The Syslog Protocol</a> · <a href="https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-4625">Microsoft, 이벤트 4625</a></li>
+</ul>
+
+<nav class="pager"><a href="dlp.html"><span>앞 장비</span>자료유출방지(DLP)</a><a href="index.html" style="text-align:right"><span>처음으로</span>보안장비 자세히 보기</a></nav>
+</article>
+</main>
+<footer>아이온퓨처 전략기획팀 · <a href="index.html">보안장비 자세히 보기</a> · <a href="../index.html">본문으로</a></footer>
+</body>
+</html>
