@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>실습편: 공개 데이터로 로그 찾기 | 보안장비 자세히 보기 | AION Tech Blog</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="../eq/style.css">
+</head>
+<body>
+<header class="mast"><div><b>AION Tech Blog</b><span><a href="../index.html">보안은 어떻게 진화했나</a> › <a href="../eq/index.html">보안장비 자세히 보기</a> › 실습편</span></div></header>
+<main>
+<p class="kicker">실습편 · 초안</p>
+<h1>공개 데이터로 로그 찾기</h1>
+<p class="dek">Splunk가 공개한 실습 데이터 BOTS v3로 장비 편의 로그 칸을 직접 찾아봅니다 · 본문 <a href="../index.html#s9">9장</a>의 「로그와 관제」 단계</p>
+<p class="ask"><small>이 실습이 답하는 질문</small>장비 편에서 읽은 칸을 실제 로그 더미에서 찾을 수 있는가</p>
+<article>
+
+<h2>시작 전에 읽을 것</h2>
+<p>이 실습은 교재와 장비 편을 한 번 읽었다고 보고 시작합니다. 아래 다섯 곳을 먼저 보면 과제가 훨씬 쉽습니다.</p>
+<ol>
+  <li>본문 <a href="../index.html#s4">4장</a>: 로그를 모아 보는 일이 왜 생겼나</li>
+  <li>장비 편 첫 화면의 <a href="../eq/index.html">「로그를 읽는 여섯 칸」</a>: 시각, 출발지, 목적지, 사용자, 행위, 결과. 모든 과제가 이 여섯 칸으로 답하게 짜여 있습니다.</li>
+  <li><a href="../eq/firewall.html">방화벽</a>, <a href="../eq/edr.html">백신·EDR</a>, <a href="../eq/iam.html">IAM·MFA</a> 편의 「로그로 읽기」</li>
+  <li><a href="../eq/siem.html">SIEM</a> 편: 서로 다른 장비의 기록을 한 사건으로 잇는 법</li>
+  <li>Splunk 공식 <a href="https://help.splunk.com/en/splunk-enterprise/get-started/search-tutorial">Search Tutorial</a>: 검색 창 쓰는 법을 익히는 데 씁니다.</li>
+</ol>
+
+<h2>BOTS v3는 어떤 데이터인가</h2>
+<p>BOTS(Boss of the SOC)는 Splunk가 보안관제 실습과 대회용으로 공개한 데이터입니다. 3판은 2018년에 만들어졌습니다. 공개 저장소의 설명에 따르면 실제 보안 사고에서 모은 증거, 또는 사고를 실험실에서 재현해 얻은 기록이 들어 있습니다. 아래는 저장소 설명을 그대로 옮긴 사실입니다.</p>
+<div class="tbl"><table>
+<tr><th>항목</th><th>저장소에 적힌 내용</th></tr>
+<tr><td>크기와 형식</td><td>320.1MB, Splunk에 이미 색인된 형태(Pre-indexed)</td></tr>
+<tr><td>사용 조건</td><td>CC0 공개 저작물. 저작권을 포기했고, 어떤 보증도 하지 않는다고 적혀 있습니다.</td></tr>
+<tr><td>라이선스 용량</td><td>이미 색인된 형태로 배포되므로 하루 수집량에 따른 라이선스 제한을 신경 쓰지 않아도 된다고 적혀 있습니다.</td></tr>
+<tr><td>데이터 종류</td><td>sourcetype 102종. 방화벽(<code>cisco:asa</code>), 윈도 이벤트와 Sysmon, 백신(Symantec), 통신 기록(Splunk Stream), 웹 서버 접근 로그, Azure AD 로그인, AWS CloudTrail 등</td></tr>
+<tr><td>필요한 소프트웨어</td><td>Splunk Enterprise 7.1.7과 앱·애드온 25개. 버전을 표에 적힌 대로 맞추라고 합니다. 다른 버전은 제대로 돌 수도, 안 돌 수도 있다고 적혀 있습니다.</td></tr>
+<tr><td>경고</td><td>실제 사고 기록을 다듬지 않고 남겨서 욕설이나 불쾌한 표현이 섞여 있을 수 있습니다.</td></tr>
+</table></div>
+<p class="src">출처: <a href="https://github.com/splunk/botsv3">splunk/botsv3</a> README.</p>
+
+<h3>설치 순서</h3>
+<p>저장소에 적힌 순서는 다섯 단계입니다.</p>
+<ol>
+  <li>데이터 파일을 받고 MD5 값으로 파일이 온전한지 확인합니다.</li>
+  <li>Splunk Enterprise와 필요한 앱·애드온 25개를 설치합니다. 저장소는 각 앱의 버전을 표에 적힌 대로 맞추라고 합니다.</li>
+  <li>받은 파일을 <code>$SPLUNK_HOME/etc/apps</code> 아래에 풉니다.</li>
+  <li>Splunk를 다시 시작합니다.</li>
+  <li>검색 창에 <code>index=botsv3 earliest=0</code>을 넣으면 데이터가 보입니다.</li>
+</ol>
+<p>Splunk 7.1.7은 오래된 판입니다. 쓰던 Splunk에 섞지 말고, 실습용 서버나 가상 머신을 따로 두는 편이 낫습니다.</p>
+
+<h2>검색 다섯 가지만 알면 된다</h2>
+<p>과제는 아래 다섯 가지 검색만으로 풀 수 있게 짰습니다. 모든 검색은 <code>index=botsv3 earliest=0</code>으로 시작합니다. <code>earliest=0</code>은 「시간 범위를 처음부터」라는 뜻입니다. 2018년 데이터라 이것을 빼면 기본 시간 범위에 걸려 아무것도 안 나올 수 있습니다.</p>
+<div class="tbl"><table>
+<tr><th>하고 싶은 것</th><th>검색</th></tr>
+<tr><td>한 종류만 보기</td><td><code>sourcetype=cisco:asa</code></td></tr>
+<tr><td>원문 몇 줄만 보기</td><td><code>| head 5</code></td></tr>
+<tr><td>값마다 몇 건인지 세기</td><td><code>| stats count by 칸이름</code></td></tr>
+<tr><td>많은 순으로 놓기</td><td><code>| sort - count</code></td></tr>
+<tr><td>시간 순서로 칸만 뽑아 보기</td><td><code>| sort _time | table _time sourcetype 칸이름…</code></td></tr>
+</table></div>
+<p>칸 이름은 장비마다, 그리고 애드온마다 다릅니다. 모르는 칸은 검색 결과 왼쪽의 필드 목록에서 찾습니다. 칸 이름을 누르면 어떤 값이 몇 건씩 있는지 보입니다. 같은 내용을 표로 보려면 검색 끝에 <code>| fieldsummary</code>를 붙입니다. 아래 과제에서 칸 이름을 적지 않은 곳은 이 방법으로 직접 찾는 것이 과제의 일부입니다.</p>
+
+<h2>과제 열 가지</h2>
+<p>과제마다 「어느 장비 편과 이어지나」, 「찾는 법」, 「적을 것」을 두었습니다. 적을 것은 언제나 여섯 칸 가운데 무엇을 찾았는지로 답합니다.</p>
+
+<h3>1. 데이터 지도 그리기</h3>
+<p>찾는 법: <code>index=botsv3 earliest=0 | stats count by sourcetype | sort - count</code></p>
+<p>적을 것: 건수가 많은 sourcetype 열 개를 적고, 각각이 장비 편의 어느 장비 기록인지 짝지어 봅니다. 아래 표는 짝짓기의 출발점입니다. 표에 없는 종류는 이름만 보고 어떤 기록일지 짐작해 적은 뒤, 원문 몇 줄을 열어 맞는지 확인합니다.</p>
+<div class="tbl"><table>
+<tr><th>sourcetype</th><th>이어지는 장</th></tr>
+<tr><td><code>cisco:asa</code></td><td><a href="../eq/firewall.html">방화벽</a></td></tr>
+<tr><td><code>stream:dns</code> · <code>stream:http</code> 등 <code>stream:</code>으로 시작하는 것</td><td>Splunk Stream이 통신을 보고 남긴 기록. <a href="../eq/firewall.html">방화벽</a>·<a href="../eq/ips.html">IPS</a> 편의 출발지·목적지 칸과 견줘 봅니다.</td></tr>
+<tr><td><code>access_combined</code></td><td>웹 서버 접근 로그. <a href="../eq/waf.html">웹방화벽</a> 편의 Apache 기본 형식(Common Log Format)에 참조 주소(Referer)와 브라우저 정보(User-Agent) 두 칸을 더한 Combined 형식입니다.</td></tr>
+<tr><td><code>xmlwineventlog:microsoft-windows-sysmon/operational</code> · <code>wineventlog</code></td><td><a href="../eq/edr.html">백신·EDR</a> 편의 Sysmon과 윈도 이벤트</td></tr>
+<tr><td><code>symantec:ep:</code>으로 시작하는 것</td><td><a href="../eq/edr.html">백신·EDR</a> 편의 백신</td></tr>
+<tr><td><code>ms:aad:signin</code></td><td><a href="../eq/iam.html">IAM·MFA</a> 편의 클라우드 로그인 기록</td></tr>
+<tr><td><code>aws:cloudtrail</code></td><td>장비 편에는 없는 클라우드 작업 기록. 과제 9에서 다룹니다.</td></tr>
+</table></div>
+
+<h3>2. 방화벽 로그 한 줄 해부하기</h3>
+<p>이어지는 장: <a href="../eq/firewall.html">방화벽</a></p>
+<p>찾는 법: <code>index=botsv3 earliest=0 sourcetype=cisco:asa | head 5</code></p>
+<p>적을 것: 원문 한 줄을 골라 여섯 칸이 각각 어디에 있는지 표시합니다. 장비 편의 Fortinet 로그는 <code>칸=값</code> 꼴이었습니다. Cisco ASA 로그는 꼴이 다릅니다. 칸 이름 없이 문장처럼 쓰인 줄에서 출발지와 목적지를 어떻게 알아보는지 적습니다. 사용자 칸이 비어 있다면 왜 비어 있는지도 적습니다(장비 편 첫 화면의 「사용자」 줄 참고).</p>
+
+<h3>3. 방화벽의 결과 칸 세기</h3>
+<p>이어지는 장: <a href="../eq/firewall.html">방화벽</a></p>
+<p>찾는 법: 과제 2의 검색에서 <code>| head 5</code>를 빼고, 왼쪽 필드 목록에서 허용·차단을 담은 칸을 찾습니다. 그 칸으로 <code>| stats count by 칸이름</code>을 돌립니다.</p>
+<p>적을 것: 결과 칸의 이름, 값의 종류와 건수. 차단 기록만 남기도록 설정한 방화벽이라면 허용 건수가 거의 없을 수 있습니다. 숫자가 적다고 통신이 적었다는 뜻은 아닙니다. 이 데이터에서는 어느 쪽인지 판단해 적습니다.</p>
+
+<h3>4. 가장 많이 조회된 도메인</h3>
+<p>이어지는 장: <a href="../eq/sandbox.html">샌드박스</a>(「DNS 기록에서 그 도메인을 조회한 PC」), <a href="../eq/firewall.html">방화벽</a></p>
+<p>찾는 법: <code>index=botsv3 earliest=0 sourcetype=stream:dns</code>에서 조회한 도메인을 담은 칸을 찾아 <code>| stats count by 칸이름 | sort - count</code></p>
+<p>적을 것: 상위 열 개. 그 가운데 운영체제 업데이트나 클라우드 서비스처럼 평범한 것과 처음 보는 것을 나눕니다. 처음 보는 것 하나를 골라 그 도메인을 조회한 출발지 주소를 찾습니다.</p>
+
+<h3>5. 웹 서버가 돌려준 응답 코드</h3>
+<p>이어지는 장: <a href="../eq/waf.html">웹방화벽</a></p>
+<p>찾는 법: <code>index=botsv3 earliest=0 sourcetype=access_combined</code>에서 응답 코드 칸을 찾아 건수를 셉니다.</p>
+<p>적을 것: 200, 300번대, 400번대, 500번대가 각각 몇 건인지. 400번대를 가장 많이 받은 출발지 주소 하나를 골라, 그 주소가 요청한 주소(URL) 몇 줄을 적습니다. 웹방화벽 편의 접근 로그 풀이와 같은 칸이 어디인지 표시합니다.</p>
+
+<h3>6. 누가 무엇을 실행했나</h3>
+<p>이어지는 장: <a href="../eq/edr.html">백신·EDR</a></p>
+<p>찾는 법: Sysmon sourcetype에서 이벤트 번호를 담은 칸을 찾아, 프로세스 생성(1번)만 고릅니다.</p>
+<p>적을 것: 실행된 프로그램, 그 프로그램을 띄운 부모 프로그램, 명령줄, 사용자를 담은 칸의 이름. 그다음 부모가 문서 프로그램(워드, 엑셀)이거나 명령줄이 유난히 긴 줄을 하나 찾아봅니다. 없으면 없다고 적습니다. 장비 편 EDR 편에서 4688과 Sysmon을 비교한 대목을 다시 읽고, 이 데이터의 Sysmon 기록에만 있는 칸을 하나 적습니다.</p>
+
+<h3>7. 백신이 무엇을 잡았나</h3>
+<p>이어지는 장: <a href="../eq/edr.html">백신·EDR</a></p>
+<p>찾는 법: <code>index=botsv3 earliest=0 sourcetype=symantec:ep:risk:file</code></p>
+<p>적을 것: 탐지 한 건을 골라 기기 이름, 파일 경로, 탐지 이름, 백신이 한 조치(격리, 삭제, 그대로 둠 등)를 담은 칸을 적습니다. 「잡았다」와 「치료했다」가 같은 말인지, 이 기록의 결과 칸으로 판단해 봅니다.</p>
+
+<h3>8. 클라우드 로그인 실패 읽기</h3>
+<p>이어지는 장: <a href="../eq/iam.html">IAM·MFA</a></p>
+<p>찾는 법: <code>index=botsv3 earliest=0 sourcetype=ms:aad:signin</code>에서 오류 코드를 담은 칸을 찾아 건수를 셉니다.</p>
+<p>적을 것: 나온 오류 코드와 건수. IAM 편의 오류 코드 표에 있는 코드는 표의 풀이를 옮기고, 표에 없는 코드는 Microsoft 문서에서 찾아 적습니다. IAM 편에서 말한 대로, 오류 코드 하나만으로 비밀번호가 새었다고 판단하지 않습니다. 판단에 무엇이 더 필요한지 적습니다.</p>
+
+<h3>9. 클라우드에서 누가 무엇을 바꿨나</h3>
+<p>이어지는 장: 장비 편에는 없습니다. 서버를 클라우드에 두면 그 위에서 한 작업은 클라우드 사업자가 남기는 기록으로 봅니다.</p>
+<p>AWS 문서에 따르면 CloudTrail 기록 한 건에는 요청한 작업 이름(<code>eventName</code>), 요청한 계정 정보(<code>userIdentity</code>), 요청이 온 IP 주소(<code>sourceIPAddress</code>), 요청이 끝난 시각(<code>eventTime</code>, UTC)이 들어갑니다. 요청이 오류로 끝나면 서비스가 돌려준 오류가 <code>errorCode</code>와 <code>errorMessage</code> 칸에 남습니다. 다만 같은 문서는 오류 정보를 이 두 칸이 아니라 응답 내용(<code>responseElements</code>) 안에 담는 서비스도 있다고 적고 있습니다. 그래서 <code>errorCode</code> 칸이 없다는 것만으로 성공한 요청이라고 보지 않습니다.</p>
+<p>찾는 법: <code>index=botsv3 earliest=0 sourcetype=aws:cloudtrail | stats count by eventName | sort - count</code>. 오류만 보려면 <code>errorCode=*</code>를 더합니다. 이 조건에 잡히지 않는 오류도 있을 수 있으니, 많이 나온 작업 몇 건은 <code>responseElements</code>도 열어 봅니다. 칸 이름이 다르게 보이면 왼쪽 필드 목록에서 찾습니다.</p>
+<p>적을 것: 많이 나온 작업 이름 다섯 개, 오류로 끝난 요청의 작업 이름과 요청한 계정. 이 다섯 칸을 여섯 칸 가운데 어디에 넣을지 적습니다. 목적지 칸에 해당하는 것이 무엇인지가 이 과제의 질문입니다.</p>
+
+<h3>10. 한 줄로 잇기</h3>
+<p>이어지는 장: <a href="../eq/siem.html">SIEM</a></p>
+<p>찾는 법: 과제 2~9에서 눈에 띈 값 하나(IP 주소, 계정, 기기 이름)를 고릅니다. <code>index=botsv3 earliest=0 "그 값" | stats count by sourcetype</code>으로 그 값이 어느 기록들에 나오는지 봅니다. 그다음 <code>index=botsv3 earliest=0 "그 값" | sort _time | table _time sourcetype</code>에 과제에서 찾은 칸 이름을 덧붙여 시간 순서로 늘어놓습니다.</p>
+<p>적을 것: 서로 다른 기록 셋 이상이 이어지는 짧은 표. SIEM 편의 사건 표처럼 줄마다 여섯 칸을 채웁니다. 시각이 기록마다 다른 시간대로 남았을 수 있습니다. 순서가 이상해 보이면 먼저 시간대를 확인합니다(SIEM 편 「칸 맞추기」 참고).</p>
+
+<h2>답은 어떻게 맞추나</h2>
+<p>이 실습에는 정답표가 없습니다. 과제는 「어느 칸에서 찾았는가」를 묻도록 짰고, 답이 맞는지는 원문 로그로 확인합니다. 적은 칸마다 그 칸이 든 기록 한 건을 원문(이벤트 전체)으로 열고, 칸의 값이 원문 어느 자리에서 왔는지 찾아 둘을 나란히 적습니다. 칸 이름은 원문에 없을 수 있습니다. Splunk 문서는 예시 이벤트에서 값을 골라 칸으로 뽑고 그 칸에 이름을 붙이는 방법을 안내합니다. 칸 이름은 값을 뽑으면서 붙인 이름일 수 있으므로, 원문에서는 값과 그 위치를 확인합니다. 값이 원문에서 엉뚱한 자리(예: 출발지 IP를 적었는데 원문에서는 목적지 자리)에서 왔다면 칸을 잘못 고른 것입니다. 건수는 검색 문을 다시 읽어 확인합니다. 과제가 말한 sourcetype을 썼는지, <code>earliest=0</code>을 넣었는지, 과제에 없는 조건이 끼지 않았는지를 봅니다.</p>
+<p>다른 사람과 답을 맞대 보는 것은 갈린 곳을 찾는 데만 씁니다. 두 사람이 같은 칸을 잘못 고를 수도 있으니, 답이 같아도 원문 확인은 건너뛰지 않습니다. 건수가 다르면 두 검색 문을 나란히 놓고 위 조건 가운데 어디서 갈렸는지 봅니다.</p>
+<p>저장소는 BOTS를 실습 데이터이자 문제를 풀며 점수를 겨루는 대회(CTF)용 플랫폼으로 소개하고, 점수판 소프트웨어는 별도 저장소로 안내합니다. 이 실습은 대회 문제를 쓰지 않았습니다.</p>
+
+<h2>확인 질문</h2>
+<ol>
+  <li>과제 2와 과제 6에서 「출발지」는 각각 무엇으로 남았나요? IP 주소와 기기 이름 가운데 어느 것이었고, 둘을 이으려면 어떤 기록이 더 필요한가요?</li>
+  <li>과제 10에서 이은 표의 첫 줄과 마지막 줄 사이에 빠진 고리가 있다면, 장비 편의 어느 장비 기록이 그 고리를 메워 줄 수 있나요?</li>
+</ol>
+
+<h2>출처</h2>
+<ul>
+  <li><a href="https://github.com/splunk/botsv3">Splunk, botsv3 README</a>: 데이터 크기, 형식, 사용 조건, sourcetype 목록, 필요한 소프트웨어, 설치 순서, 경고</li>
+  <li><a href="https://help.splunk.com/en/splunk-enterprise/get-started/search-tutorial">Splunk, Search Tutorial</a></li>
+  <li><a href="https://docs.splunk.com/Documentation/Splunk/8.2.12/SearchReference/Fieldsummary">Splunk, fieldsummary</a></li>
+  <li><a href="https://help.splunk.com/en/splunk-enterprise/manage-knowledge-objects/knowledge-management-manual/9.0/use-the-field-extractor-in-splunk-web/field-extractor-select-fields-step">Splunk, Field extractor: Select fields step</a>: 예시 이벤트에서 값을 골라 칸 이름을 붙이는 방법</li>
+  <li><a href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html">AWS, CloudTrail record contents</a>: <code>eventTime</code>, <code>eventName</code>, <code>userIdentity</code>, <code>sourceIPAddress</code>, <code>errorCode</code>, <code>errorMessage</code>, <code>responseElements</code></li>
+</ul>
+
+<nav class="pager"><a href="../eq/index.html"><span>돌아가기</span>보안장비 자세히 보기</a><a href="../index.html#s9" style="text-align:right"><span>본문</span>9장 공부의 순서</a></nav>
+</article>
+</main>
+<footer>아이온퓨처 전략기획팀 · 실습편 초안(공개 전) · <a href="../eq/index.html">보안장비 자세히 보기</a> · <a href="../index.html">본문으로</a></footer>
+</body>
+</html>
