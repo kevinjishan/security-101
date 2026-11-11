@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>XDR과 SOAR | 보안장비 자세히 보기 | AION Tech Blog</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="mast"><div><b>AION Tech Blog</b><span><a href="../index.html">보안은 어떻게 진화했나</a> › <a href="index.html">보안장비 자세히 보기</a></span></div></header>
+<main>
+<p class="kicker">보안장비 자세히 보기 · 2부 4 / 5</p>
+<h1>XDR과 SOAR</h1>
+<p class="dek">탐지를 한 사건으로 묶고, 대응 절차를 자동으로 돌리는 곳 · 본문 <a href="../index.html#s6">6장</a>(XDR·SOAR), <a href="../index.html#s7">7장</a>(경보의 양)</p>
+<p class="ask"><small>이 장비가 답하는 질문</small>따로 울린 경보들이 한 공격인가, 그렇다면 무엇부터 어떤 순서로 막을까</p>
+<ol class="path"><li>PC · 메일 · 계정 · 클라우드의 탐지</li><li class="on">XDR (사건으로 묶기)</li><li class="on">SOAR (대응 절차 실행)</li><li>보안관제센터</li></ol>
+<article>
+
+<h2>어디에 서 있나</h2>
+<p>XDR은 <a href="edr.html">EDR</a>에서 넓어진 것입니다. EDR이 PC와 서버 안을 본다면, XDR은 PC·서버의 에이전트, 메일 보안, 계정 보안, 클라우드 보안의 탐지를 한 플랫폼에 모읍니다. 어디까지 모으는지는 제품마다 다릅니다. SOAR(Security Orchestration, Automation and Response)는 SIEM이나 XDR 옆에 서서, 다른 장비들에 명령을 보내 대응 절차를 실행하는 시스템입니다. 둘 다 통신의 길목에 서지 않고, 다른 장비가 낸 탐지를 받아 일합니다.</p>
+
+<h2>무엇을 보고 판단하나</h2>
+
+<h3>XDR: 경보 여러 개를 사건 하나로</h3>
+<p>Microsoft는 자사 XDR 제품(Microsoft 365 Defender)의 사건(incident)을 「서로 연관된 경보와 관련 정보의 모음으로, 공격의 이야기를 보여 주는 것」이라고 설명합니다. 문서가 드는 까닭은 이렇습니다. 공격은 기기, 사용자, 메일함처럼 여러 종류의 대상에 여러 기법을 씁니다. 그 결과 여러 대상에서 여러 경보가 생깁니다. 이 경보들을 사람이 하나씩 맞춰 보는 일은 어렵고 시간이 걸리므로, 제품이 경보와 관련 정보를 자동으로 모아 사건 하나로 만든다는 것입니다. 경보(alert) 형식 문서는 같은 공격 기법이나 같은 공격자와 관련된 경보를 자동으로 사건에 묶는다고 적습니다.</p>
+<p><a href="siem.html">SIEM</a>도 경보를 사건으로 묶습니다. 회사가 적은 룰로 엮기도 하고, 제품이 스스로 엮기도 합니다. Microsoft Sentinel(SIEM)의 Fusion은 머신러닝으로 여러 제품의 이상 징후와 경보를 엮어 둘 이상의 경보나 활동으로 된 사건을 만들고, 처음부터 켜져 있습니다. 둘이 다른 곳은 엮는 재료의 범위입니다. SIEM은 회사가 연결한 여러 장비의 로그를 모아 엮고, XDR은 플랫폼에 연결된 제품들이 낸 탐지를 그 플랫폼 안에서 엮습니다. 두 가지를 함께 쓰는 회사도 있고, 둘의 경계는 제품마다 다릅니다. Microsoft 문서는 Sentinel을 Defender 포털로 옮기면 Fusion이 꺼지고, 그 일을 Defender XDR의 상관 엔진이 맡는다고 적습니다.</p>
+
+<h3>SOAR: 대응 절차를 순서대로 실행</h3>
+<p>본문 <a href="../index.html#s6">6장</a>은 SOAR를 피싱 메일의 예로 설명했습니다. 피싱 메일이 확인되면 같은 메일을 받은 사람을 찾고, 링크를 막고, 담당자에게 알리는 일을 순서대로 처리합니다. 이 순서를 적어 둔 것이 대응 절차서(플레이북)입니다. 플레이북의 단계 하나하나는 다른 장비의 기능을 부르는 일입니다. 메일 시스템에서 메일을 찾아 지우고, <a href="firewall.html">방화벽</a>에 주소를 막게 하고, <a href="edr.html">EDR</a>에 PC 격리를 시키고, <a href="iam.html">계정 서버</a>에 비밀번호를 재설정하게 합니다.</p>
+<p>모든 단계를 자동으로 돌리지는 않습니다. PC를 격리하거나 계정을 막는 일은 오탐이면 정상 업무를 멈춥니다. 그래서 이런 단계는 사람의 승인을 받고 진행하도록 짤 수 있습니다. Microsoft의 자동 조사 상태 값에 「pendingApproval(일부 동작이 사용자의 검토와 승인을 기다리며 멈춤)」이 따로 있는 것도 이 때문입니다.</p>
+
+<h2>전체 그림에서의 뜻</h2>
+<p>본문 <a href="../index.html#s6">6장</a>의 시대에 장비는 PC 안(EDR), 계정(IAM), 메일과 클라우드로 늘었고, 장비마다 경보를 냈습니다. 본문 <a href="../index.html#s7">7장</a>이 다루는 문제가 여기서 나옵니다. 경보는 늘었는데 판단할 사람은 그만큼 늘지 않았습니다. XDR은 경보의 수를 사건의 수로 줄이고, SOAR는 사람이 매번 손으로 하던 대응을 줄입니다. 7장의 AI SOC는 그 다음 단계로, 사건을 조사하고 1차 판단을 정리하는 일까지 맡기려 합니다.</p>
+
+<h2>로그로 읽기</h2>
+
+<h3>XDR의 사건과 경보</h3>
+<p>아래는 Microsoft Graph 보안 API의 사건(incident)과 경보(alert) 형식에서 칸 몇 개를 골라, <a href="edr.html">EDR</a> 편의 「워드가 파워셸을 띄웠다」 사건으로 이어지는 이야기를 넣은 설명용 예시입니다. 칸 이름과 <code>serviceSource</code>의 값 이름은 문서 그대로이고, 나머지 값은 꾸몄습니다.</p>
+<pre class="log">incident  <span class="k">id</span> 4127   <span class="k">severity</span> high   <span class="k">status</span> active   <span class="k">classification</span> unknown
+
+alerts    <span class="k">createdDateTime</span>        <span class="k">serviceSource</span>                    <span class="k">mitreTechniques</span>
+          2026-11-10T05:10:02Z   microsoftDefenderForOffice365    T1566.001
+          2026-11-10T05:12:51Z   microsoftDefenderForEndpoint     T1059.001
+          2026-11-10T05:47:30Z   azureAdIdentityProtection        T1078
+          (세 경보 모두 <span class="k">incidentId</span> 4127 · 관련 사용자 lee.sy · 기기 PC-SALES-031)</pre>
+<p class="src">칸 이름과 뜻: Microsoft Learn, 「incident resource type」·「alert resource type」·「Security enum values」(Microsoft Graph v1.0). 값은 설명용으로 꾸민 것입니다.</p>
+
+<div class="tbl"><table>
+<tr><th>칸</th><th>예시 값</th><th>읽는 법</th></tr>
+<tr><td><code>serviceSource</code></td><td>…Office365 · …Endpoint · azureAdIdentityProtection</td><td>어느 제품이 경보를 냈나. 차례로 메일 보안, PC 에이전트(EDR), 계정 위험 탐지입니다. 서로 다른 세 제품의 경보가 한 사건에 들어 있다는 것이 XDR의 요점입니다.</td></tr>
+<tr><td><code>mitreTechniques</code></td><td>T1566.001 · T1059.001 · T1078</td><td>MITRE ATT&amp;CK 기법 번호입니다. 차례로 첨부파일 피싱, 파워셸 실행, 정상 계정의 사용입니다. 번호를 따라 읽으면 메일로 들어와, PC에서 실행되고, 계정으로 넓어진 순서가 보입니다.</td></tr>
+<tr><td><code>severity</code></td><td>high</td><td>문서의 값은 unknown, informational, low, medium, high입니다.</td></tr>
+<tr><td><code>status</code></td><td>active</td><td>사건이 처리 중인지(active, inProgress), 끝났는지(resolved)입니다.</td></tr>
+<tr><td><code>classification</code></td><td>unknown</td><td>진짜 공격인지 판정한 결과입니다. 아직 판정 전이면 unknown, 판정 뒤에는 truePositive(진짜)나 falsePositive(오탐) 등이 들어갑니다. 관제 인력의 판단이 기록으로 남는 칸입니다.</td></tr>
+</table></div>
+<p>세 경보를 따로 보면 이렇습니다. 메일 보안은 의심스러운 첨부파일이 든 메일을 보았고, EDR은 워드가 파워셸을 띄운 것을 보았고, 계정 보안은 lee.sy 계정의 위험한 로그인을 보았습니다. 담당자가 셋이면 각자 자기 경보 하나만 봅니다. 사건으로 묶이면 「메일 첨부로 PC가 감염됐고, 그 PC 사용자의 계정이 밖에서 쓰였다」는 이야기 하나가 됩니다.</p>
+
+<h3>SOAR의 실행 기록</h3>
+<p>플레이북이 돌면 단계마다 언제 무엇을 했고 결과가 어땠는지가 남습니다. 아래는 위 사건에 피싱 대응 플레이북을 돌린 기록의 설명용 예시입니다. 실행 기록의 형식은 제품마다 달라서, 단계와 값은 모두 꾸몄습니다. 동작 이름 가운데 forcePasswordReset, revokeAllSessions는 Microsoft Graph 보안 API의 동작 값 이름입니다.</p>
+<div class="tbl"><table>
+<tr><th>시각(UTC)</th><th>단계</th><th>결과</th></tr>
+<tr><td>05:48:02</td><td>같은 메일(보낸 주소·제목·첨부 체크섬)을 받은 사람 찾기</td><td>4명</td></tr>
+<tr><td>05:48:40</td><td>4명의 메일함에서 그 메일 지우기</td><td>완료</td></tr>
+<tr><td>05:49:15</td><td>첨부 체크섬과 같은 파일이 있는 PC 찾기(EDR)</td><td>1대 (PC-SALES-031)</td></tr>
+<tr><td>05:49:20</td><td>PC-SALES-031 격리</td><td>승인 대기</td></tr>
+<tr><td>05:49:20</td><td>lee.sy 비밀번호 재설정(forcePasswordReset), 모든 세션 끊기(revokeAllSessions)</td><td>승인 대기</td></tr>
+<tr><td>05:56:08</td><td>관제 인력 승인 뒤 두 단계 실행</td><td>완료</td></tr>
+</table></div>
+<p>앞의 세 단계는 되돌릴 수 있거나 업무를 멈추지 않으므로 바로 실행했고, PC 격리와 계정 조치는 사람의 승인을 기다렸습니다. 사고 뒤에는 이 기록이 「언제 알았고, 언제 무엇을 막았는가」의 근거가 됩니다.</p>
+
+<h3>이 로그로 답할 수 있는 질문</h3>
+<ul>
+  <li>이번 달 사건은 몇 건이고, 그 가운데 진짜 공격으로 판정된 것은 몇 건인가</li>
+  <li>어느 제품의 경보가 사건으로 가장 많이 이어졌나</li>
+  <li>경보가 난 뒤 격리까지 걸린 시간은 얼마이고, 승인 대기에서 얼마를 썼나</li>
+</ul>
+
+<h3>이 로그만으로는 모르는 것</h3>
+<p>XDR은 플랫폼에 연결된 제품이 낸 경보만 묶습니다. 플랫폼에 들어오지 않은 장비, 예를 들어 다른 회사의 방화벽, <a href="netsep.html">망간 자료전송</a> 장비, 업무 시스템의 기록은 사건에서 빠질 수 있습니다. 그 빈자리는 SIEM이 메웁니다. SOAR는 적어 둔 절차만 실행합니다. 처음 보는 유형의 공격은 플레이북이 없으므로 사람이 판단해야 합니다.</p>
+
+<h2>확인 질문</h2>
+<ol>
+  <li>SIEM의 상관분석과 XDR의 사건 묶기는 무엇이 다른가요?</li>
+  <li>위 플레이북에서 바로 실행한 단계와 승인을 기다린 단계는 무엇으로 나뉘었나요?</li>
+</ol>
+
+<h2>더 공부할 것</h2>
+<ul>
+  <li>플레이북 설계: 무엇을 자동으로 하고 무엇을 사람이 승인하는가</li>
+  <li>MITRE ATT&amp;CK 기법 번호로 사건을 읽는 법: T1566(피싱), T1059(명령 실행), T1078(정상 계정 사용)</li>
+  <li>원문: <a href="https://learn.microsoft.com/en-us/graph/api/resources/security-incident?view=graph-rest-1.0">Microsoft Learn, incident resource type</a> · <a href="https://learn.microsoft.com/en-us/graph/api/resources/security-alert?view=graph-rest-1.0">alert resource type</a> · <a href="https://learn.microsoft.com/en-us/graph/api/resources/enums-security?view=graph-rest-1.0">Security enum values</a> · <a href="https://learn.microsoft.com/en-us/azure/sentinel/fusion">Microsoft Learn, Sentinel Fusion</a></li>
+</ul>
+
+<nav class="pager"><a href="iam.html"><span>앞 장비</span>IAM과 다중 인증(MFA)</a><a href="netsep.html" style="text-align:right"><span>다음 장비</span>망분리와 망간 자료전송</a></nav>
+</article>
+</main>
+<footer>아이온퓨처 전략기획팀 · <a href="index.html">보안장비 자세히 보기</a> · <a href="../index.html">본문으로</a></footer>
+</body>
+</html>
