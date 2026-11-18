@@ -126,7 +126,7 @@ dl.terms dd i{font-style:normal;font-weight:700;color:var(--soft);font-size:13px
 <rect class="bx c5" x="245" y="38" width="180" height="30" rx="4"/><text class="t c5" x="253" y="58">클라우드 업무(메일·협업)<tspan class="tg"> 5장</tspan></text>
 <rect class="bx c2" x="440" y="38" width="260" height="30" rx="4"/><text class="t c2" x="448" y="58">재택·출장 노트북 · VPN 프로그램<tspan class="tg"> 2장</tspan></text>
 <rect class="bx c3" x="20" y="122" width="140" height="30" rx="4"/><text class="t c3" x="28" y="142">DDoS 대응장비<tspan class="tg"> 3장</tspan></text>
-<rect class="bx c1 kfw" x="20" y="162" width="140" height="30" rx="4"/><text class="t c1 fwl" x="28" y="182">방화벽<tspan class="tg"> 1·2장</tspan></text><text class="t c1 pf" x="28" y="182">패킷 필터</text>
+<rect class="bx c1 kfw" x="20" y="162" width="140" height="30" rx="4"/><text class="t c1 fwl" x="28" y="182">방화벽<tspan class="tg"> 1·2장</tspan></text><text class="t c1 pf" x="28" y="182">라우터 ACL</text>
 <rect class="bx c3" x="20" y="202" width="140" height="30" rx="4"/><text class="t c3" x="28" y="222">IPS<tspan class="tg"> 3장</tspan></text>
 <rect class="bx c2" x="20" y="242" width="140" height="30" rx="4"/><text class="t c2" x="28" y="262">VPN<tspan class="tg"> 2장</tspan></text>
 <rect class="bx c5" x="20" y="282" width="140" height="30" rx="4"/><text class="t c5" x="28" y="302">APT 대응장비<tspan class="tg"> 5장</tspan></text>
@@ -296,7 +296,7 @@ dl.terms dd i{font-style:normal;font-weight:700;color:var(--soft);font-size:13px
 
 <figure class="cmap st3"><svg viewBox="0 0 720 520" role="img" aria-label="3장까지의 회사 그림"><use href="#cmap"/></svg><figcaption>3장까지의 회사 그림. 굵은 테두리는 이 장에서 생긴 것, 흐린 테두리는 앞 장에서 생긴 것입니다. 1·2·3은 새벽 사건의 순서입니다.</figcaption></figure>
 <div class="field case"><span class="lab">한 회사로 따라가기: 새벽 사건</span>
-<p>IPS는 허용한 통신 안에서 알려진 공격의 특징(시그니처)을 찾습니다. ③ 바깥 전송은 443번 암호화 통신이라, 암호를 풀어 보는 설정을 따로 하지 않았다면 IPS에는 내용이 보이지 않습니다. ② 비밀번호 대입은 그림처럼 IPS를 입구에만 두었다면 IPS를 지나지 않습니다. WAF는 웹 서버 앞에 있어 파일 서버의 일과 관계가 없습니다. 이 장의 장비는 입구로 들어오는 공격을 막는 데 맞춰져 있고, 정상 계정으로 들어온 사람의 행동은 그 범위 밖입니다.</p>
+<p>IPS는 허용한 통신 안에서 알려진 공격의 시그니처를 찾습니다. ③ 바깥 전송은 443번 암호화 통신이라, 암호를 풀어 보는 설정을 따로 하지 않았다면 IPS에는 내용이 보이지 않습니다. ② 비밀번호 대입은 그림처럼 IPS를 입구에만 두었다면 IPS를 지나지 않습니다. WAF는 웹 서버 앞에 있어 파일 서버의 일과 관계가 없습니다. 이 장의 장비는 입구로 들어오는 공격을 막는 데 맞춰져 있고, 정상 계정으로 들어온 사람의 행동은 그 범위 밖입니다.</p>
 </div>
 
 <h3>확인 질문</h3>
@@ -484,7 +484,7 @@ dl.terms dd i{font-style:normal;font-weight:700;color:var(--soft);font-size:13px
 <p>OpenAI는 2022년 11월 30일 ChatGPT를 공개했습니다. 생성형 AI가 문서를 읽고, 요약하고, 질문에 답하는 일을 사람 가까운 수준으로 해내기 시작했습니다.</p>
 
 <h3>어떤 문제가 남았나</h3>
-<p>6장까지 장비와 로그가 늘어난 결과, 보안관제 조직이 받는 경보도 늘었습니다. 보안 업체 Vectra가 의뢰해 조사회사 Sapio Research가 2023년 3~4월에 직원 1,000명 이상 조직의 보안 분석가 2,000명에게 물은 조사가 있습니다. 하루에 받는 경보는 평균 4,484건이었고, 응답자들은 그 가운데 67%를 처리하지 못한다고 답했습니다. 경보의 83%는 오탐으로 봤고, 경보를 분류하는 데 하루 평균 2.7시간을 쓴다고 답했습니다. 조사한 열 개 나라·권역에 한국은 없고, 응답자가 스스로 답한 값이며, 보안 제품을 파는 회사가 의뢰한 조사라는 점을 함께 읽어야 합니다.</p>
+<p>6장까지 장비와 로그가 늘어난 결과, 보안관제 조직이 받는 경보도 늘었습니다. 보안 업체 Vectra가 의뢰해 조사회사 Sapio Research가 2023년 3~4월에 직원이 1,000명을 넘는 조직의 보안 분석가 2,000명에게 물은 조사가 있습니다. SOC 팀 하나가 하루에 받는 경보는 평균 4,484건이었고, 응답자들은 그 가운데 67%를 처리하지 못한다고 답했습니다. 보고서는 응답자들이 받는 경보의 83%를 오탐으로 봤다고 적었습니다. 같은 회사 보도자료는 이 값을 「응답자의 83%」로 적어 기준이 다릅니다. 분석가 한 명은 경보를 손으로 분류하는 데 하루 평균 2.7시간을 쓴다고 답했습니다. 조사한 열 개 나라·권역에 한국은 없고, 응답자가 스스로 답한 값이며, 보안 제품을 파는 회사가 의뢰한 조사라는 점을 함께 읽어야 합니다.</p>
 
 <h3>어떤 장비가 생기고 있나</h3>
 <p>Gartner는 2026년 사이버보안 트렌드의 하나로 「AI 기반 SOC가 운영 관행을 흔든다」를 꼽았습니다. 또 2028년까지 SOC에 AI를 효과적으로 쓰는 조직은 사람이 개입하는 사고를 30% 줄이고, 분석가의 역할이 대응자에서 감독자로 옮겨 간다고 예측했습니다.</p>
@@ -530,7 +530,7 @@ dl.terms dd i{font-style:normal;font-weight:700;color:var(--soft);font-size:13px
 <tr><td>2000년대 중후반</td><td>보안장비가 여러 대로 늘어남</td><td>경보가 흩어져 공격 전체가 안 보임</td><td>흩어진 장비 기록</td></tr>
 <tr><td>2010년대</td><td>스마트폰, 클라우드, 데이터 급증</td><td>APT(2011 농협·2013 3·20), 내부자 유출(2014 카드 3사)</td><td>이미 들어온 공격자</td></tr>
 <tr><td>2017년~</td><td>클라우드 전환, 원격근무, 개인 기기</td><td>랜섬웨어(2017 워너크라이), 피싱으로 계정 탈취</td><td>사람·기기·계정</td></tr>
-<tr><td>2022년~</td><td>생성형 AI 확산</td><td>하루 평균 4,484건의 경보, 응답자들은 67%를 처리하지 못한다고 답함(2023 설문)</td><td>탐지·대응 시간</td></tr>
+<tr><td>2022년~</td><td>생성형 AI 확산</td><td>SOC 팀당 하루 평균 4,484건의 경보, 응답자들은 67%를 처리하지 못한다고 답함(2023 설문)</td><td>탐지·대응 시간</td></tr>
 </table></div>
 
 <p>시기마다 새로 생긴 것은 종류가 넷입니다. 장비는 네트워크의 길목에 놓는 기기, 프로그램은 서버·PC에 설치하거나 구독해 쓰는 소프트웨어, 조직은 그 일을 맡는 사람과 업무, 방식은 사는 물건이 아니라 설계 원칙입니다. 같은 이름이 두 형태로 팔리기도 합니다. 방화벽은 기기로도 클라우드 서비스로도 팔리고, DLP는 네트워크 장비로도 PC 프로그램으로도 들어갑니다. 아래 표는 이 글에서 처음 소개한 형태로 나눴습니다.</p>
@@ -621,7 +621,7 @@ dl.terms dd i{font-style:normal;font-weight:700;color:var(--soft);font-size:13px
 <dt>시그니처<small>3장</small></dt>
 <dd><i>뜻</i>알려진 공격이나 악성코드의 특징을 적은 탐지 규칙.</dd>
 <dd><i>현장 업무</i>제조사가 업데이트로 내려보냅니다.</dd>
-<dd><i>헷갈리는 짝</i>이상행위 탐지(UEBA)는 정해 둔 특징 대신 평소와 다른 움직임을 찾습니다.</dd>
+<dd><i>헷갈리는 짝</i>이상행위 탐지(UEBA)는 정해 둔 시그니처 대신 평소와 다른 움직임을 찾습니다.</dd>
 <dt>IDS·IPS(침입탐지·침입방지)<small>3장</small></dt>
 <dd><i>뜻</i>통신 안에서 시그니처에 맞는 공격을 찾는 장비.</dd>
 <dd><i>현장 업무</i>새 규칙은 경보만 내게 두고 지켜본 뒤 차단으로 바꿉니다(튜닝).</dd>
@@ -660,7 +660,7 @@ dl.terms dd i{font-style:normal;font-weight:700;color:var(--soft);font-size:13px
 <dd><i>뜻</i>목표를 정해 두고 안에 오래 숨어 있다가 공격하는 방식. 농협 사건에서 공격자는 일곱 달 동안 안에 있었습니다.</dd>
 <dt>샌드박스(APT 대응장비)<small>5장</small></dt>
 <dd><i>뜻</i>의심스러운 파일을 격리된 가상 환경에서 실제로 실행해 악성 행위를 하는지 보는 장비.</dd>
-<dd><i>헷갈리는 짝</i>백신은 파일이 알려진 악성코드의 특징과 맞는지 대조합니다.</dd>
+<dd><i>헷갈리는 짝</i>백신은 파일이 알려진 악성코드의 시그니처와 맞는지 대조합니다.</dd>
 <dt>SIEM<small>5장</small></dt>
 <dd><i>뜻</i>보안장비, 서버, 업무 시스템의 로그를 모아 저장·검색하고 상관분석으로 위협을 찾는 시스템.</dd>
 <dd><i>현장 업무</i>SIEM 구축은 수집 대상 정하기, 파싱, 정규화, 룰과 대시보드 만들기로 이뤄집니다. 규모는 일 수집량과 보관 기간으로 말합니다.</dd>
@@ -726,7 +726,7 @@ dl.terms dd i{font-style:normal;font-weight:700;color:var(--soft);font-size:13px
 
 <h2 id="refs">부록 B. 참고 자료</h2>
 <ul>
-  <li>보안관제 경보 수(하루 평균 4,484건, 67% 처리 못 함, 83% 오탐 응답, 분류 2.7시간)와 조사 방법(Sapio Research, 2023년 3~4월, 직원 1,000명 이상 조직 분석가 2,000명, 10개 나라·권역): <a href="https://www.vectra.ai/resources/research-reports/2023-state-of-threat-detection">Vectra AI, 2023 State of Threat Detection</a> 6쪽·15쪽</li>
+  <li>보안관제 경보 수(SOC 팀당 하루 평균 4,484건, 67% 처리 못 함, 경보의 83% 오탐 응답(보도자료는 「응답자의 83%」로 적음), 분석가 한 명의 하루 분류 2.7시간)와 조사 방법(Sapio Research, 2023년 3~4월, 직원 1,000명 초과 조직 분석가 2,000명, 10개 나라·권역): <a href="https://www.vectra.ai/resources/research-reports/2023-state-of-threat-detection">Vectra AI, 2023 State of Threat Detection</a> 6쪽·15쪽, <a href="https://www.vectra.ai/about/news/research-reveals-significant-disconnect-between-security-operations-teams-and-the-effectiveness-of-threat-detection-tools-in-preventing-cyber-attacks">Vectra AI 보도자료</a></li>
   <li>모리스 웜 일시·감염 규모·웜의 정의: <a href="https://www.fbi.gov/history/cases-and-criminals/morris-worm">FBI, Morris Worm</a></li>
   <li>패킷 필터링의 1989년 모습: <a href="https://ftp.mirrorservice.org/sites/www.bitsavers.org/pdf/dec/tech_reports/WRL-89-4.pdf">J. Mogul, Simple and Flexible Datagram Access Controls for Unix-based Gateways, DEC WRL Research Report 89/4 (1989-03)</a></li>
   <li>DEC 패킷 필터, Check Point FireWall-1, UTM·NGFW: <a href="https://blog.apnic.net/2024/06/25/the-evolution-of-network-security/">APNIC Blog (2024-06-25)</a></li>
@@ -769,6 +769,6 @@ dl.terms dd i{font-style:normal;font-weight:700;color:var(--soft);font-size:13px
 
 </article>
 </main>
-<footer>아이온퓨처 전략기획팀이 쓴 보안 입문 글입니다. 출처는 맨 아래 「참고 자료」에 있습니다. v3.7 (2026-11-18)</footer>
+<footer>아이온퓨처 전략기획팀이 쓴 보안 입문 글입니다. 출처는 맨 아래 「참고 자료」에 있습니다. v3.8 (2026-11-18)</footer>
 </body>
 </html>
