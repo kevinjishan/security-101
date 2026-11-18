@@ -185,7 +185,7 @@ dl.terms dd i{font-style:normal;font-weight:700;color:var(--soft);font-size:13px
 <figure><img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b6/Morris_Worm.jpg/1280px-Morris_Worm.jpg" alt="모리스 웜 소스 코드가 담긴 플로피 디스크" loading="lazy"><figcaption>모리스 웜 소스 코드가 담긴 플로피 디스크 전시품</figcaption></figure>
 
 <h3>어떤 장비가 생겼나</h3>
-<p>같은 1980년대 말 DEC가 네트워크 입구에서 통신을 거르는 패킷 필터를 처음 내놓았습니다. 패킷 필터는 정해 둔 규칙 목록에 따라, 패킷의 주소와 포트를 보고 통과시킬지 막을지를 정합니다. 이것이 방화벽의 시작입니다. 컴퓨터 안에서는 악성 프로그램을 찾아 지우는 백신이 쓰이기 시작했습니다.</p>
+<p>같은 1980년대 말, 네트워크 입구의 라우터(게이트웨이)는 패킷의 주소와 포트를 보고 통신을 거르는 패킷 필터링을 하고 있었습니다. 1989년 DEC 연구소 보고서는 당시 상용 게이트웨이 제품 대부분이 이미 이 기능을 갖췄다고 적었습니다. 규칙 목록은 ACL(접근 제어 목록)이라 부르고, 라우터는 위 줄부터 대 보아 처음 맞는 줄대로 통과시킬지 막을지를 정합니다. 이것이 방화벽의 시작입니다. 컴퓨터 안에서는 악성 프로그램을 찾아 지우는 백신이 쓰이기 시작했습니다.</p>
 
 <h3>사고 뒤에 바뀐 것</h3>
 <p>모리스 웜이 퍼진 1988년 11월 직후, 미국 국방고등연구계획국(DARPA)은 카네기멜런대 소프트웨어공학연구소(SEI)에 센터 하나를 세우게 했습니다. 보안 비상 상황에서 전문가들의 연락을 조정하고, 같은 사고가 다시 나지 않게 돕는 곳입니다. 이것이 CERT 조정센터(CERT/CC)입니다. 사고가 나면 누가 모여 어떻게 대응할지를 맡는 조직이 이때 생겼습니다.</p>
@@ -195,7 +195,7 @@ dl.terms dd i{font-style:normal;font-weight:700;color:var(--soft);font-size:13px
 
 <figure class="cmap st1"><svg viewBox="0 0 720 520" role="img" aria-label="1장까지의 회사 그림"><use href="#cmap"/></svg><figcaption>1장까지의 회사 그림. 굵은 테두리는 이 장에서 생긴 것입니다.</figcaption></figure>
 <div class="field case"><span class="lab">한 회사로 따라가기: 새벽 사건</span>
-<p>이 시기 그림에는 입구의 패킷 필터와 직원 PC의 백신만 있습니다. 패킷 필터는 주소와 포트를 보고 통신을 거르고, 백신은 파일을 알려진 악성 파일의 특징과 비교합니다. 새벽 사건은 직원 계정과 비밀번호로 들어와 윈도에 원래 들어 있는 파워셸을 씁니다. 둘 다 이 두 가지가 살피는 대상이 아닙니다. 사건의 순서(①②③)는 회사가 바깥에서 들어오는 길을 연 2장부터 그림에 표시합니다.</p>
+<p>이 시기 그림에는 입구 라우터의 ACL(패킷 필터링)과 직원 PC의 백신만 있습니다. 패킷 필터링은 주소와 포트를 보고 통신을 거르고, 백신은 파일을 알려진 악성 파일의 시그니처와 대조합니다. 새벽 사건은 직원 계정과 비밀번호로 들어와 윈도에 원래 들어 있는 파워셸을 씁니다. 둘 다 이 두 가지가 살피는 대상이 아닙니다. 사건의 순서(①②③)는 회사가 바깥에서 들어오는 길을 연 2장부터 그림에 표시합니다.</p>
 </div>
 
 <h3>확인 질문</h3>
@@ -604,13 +604,13 @@ dl.terms dd i{font-style:normal;font-weight:700;color:var(--soft);font-size:13px
 <dt>웜<small>1장</small></dt>
 <dd><i>뜻</i>다른 프로그램에 붙지 않고 스스로 복제해 네트워크를 타고 퍼지는 악성코드.</dd>
 <dd><i>헷갈리는 짝</i>바이러스는 다른 프로그램에 붙어, 그 프로그램이 실행될 때 퍼집니다.</dd>
-<dt>패킷 필터·방화벽<small>1~2장</small></dt>
-<dd><i>뜻</i>출발지, 목적지, 포트 규칙으로 통신을 허용하거나 막는 장비.</dd>
+<dt>패킷 필터링·방화벽<small>1~2장</small></dt>
+<dd><i>뜻</i>출발지, 목적지, 포트 규칙으로 통신을 허용하거나 막는 기능(패킷 필터링)과 그 일을 맡는 장비(방화벽). 패킷 필터링은 라우터의 ACL로도 합니다.</dd>
 <dd><i>현장 업무</i>규칙을 정책이라고 부릅니다. 새 서버를 열 때 담당자가 출발지·목적지·포트·허용 여부를 적어 정책을 신청하고, 보안 담당자가 검토해 넣습니다.</dd>
 <dd><i>화면·기록</i>통신마다 시각, 출발지·목적지 주소, 포트, 허용·차단 결과.</dd>
 <dd><i>헷갈리는 짝</i>웹방화벽은 이름이 비슷하지만 주소·포트가 아니라 웹 요청의 내용을 봅니다.</dd>
 <dt>상태 기반 검사<small>2장</small></dt>
-<dd><i>뜻</i>패킷이 어떤 연결의 일부인지 기억하며 검사하는 방화벽 방식. 안에서 먼저 요청한 연결의 응답만 들여보냅니다.</dd>
+<dd><i>뜻</i>패킷이 어떤 연결의 일부인지 기억하며 검사하는 방화벽 방식. 새 연결은 정책으로 허용·차단하고, 허용한 연결은 세션 표로 추적해 그 응답과 뒤이은 패킷을 들여보냅니다.</dd>
 <dd><i>헷갈리는 짝</i>패킷 필터는 패킷을 하나씩 따로 봅니다.</dd>
 <dt>VPN(가상사설망)<small>2장</small></dt>
 <dd><i>뜻</i>인터넷 위에 암호화한 통로를 만들어 바깥에서 회사 내부망에 접속하게 하는 장비.</dd>
@@ -728,6 +728,7 @@ dl.terms dd i{font-style:normal;font-weight:700;color:var(--soft);font-size:13px
 <ul>
   <li>보안관제 경보 수(하루 평균 4,484건, 67% 처리 못 함, 83% 오탐 응답, 분류 2.7시간)와 조사 방법(Sapio Research, 2023년 3~4월, 직원 1,000명 이상 조직 분석가 2,000명, 10개 나라·권역): <a href="https://www.vectra.ai/resources/research-reports/2023-state-of-threat-detection">Vectra AI, 2023 State of Threat Detection</a> 6쪽·15쪽</li>
   <li>모리스 웜 일시·감염 규모·웜의 정의: <a href="https://www.fbi.gov/history/cases-and-criminals/morris-worm">FBI, Morris Worm</a></li>
+  <li>패킷 필터링의 1989년 모습: <a href="https://ftp.mirrorservice.org/sites/www.bitsavers.org/pdf/dec/tech_reports/WRL-89-4.pdf">J. Mogul, Simple and Flexible Datagram Access Controls for Unix-based Gateways, DEC WRL Research Report 89/4 (1989-03)</a></li>
   <li>DEC 패킷 필터, Check Point FireWall-1, UTM·NGFW: <a href="https://blog.apnic.net/2024/06/25/the-evolution-of-network-security/">APNIC Blog (2024-06-25)</a></li>
   <li>방화벽 정의: <a href="https://csrc.nist.gov/pubs/sp/800/41/r1/final">NIST SP 800-41 Rev.1 (2009-09)</a></li>
   <li>1·25 인터넷 대란: <a href="https://zdnet.co.kr/view/?no=20130415122151">ZDNet Korea</a></li>
@@ -768,6 +769,6 @@ dl.terms dd i{font-style:normal;font-weight:700;color:var(--soft);font-size:13px
 
 </article>
 </main>
-<footer>아이온퓨처 전략기획팀이 쓴 보안 입문 글입니다. 출처는 맨 아래 「참고 자료」에 있습니다. v3.6 (2026-11-16)</footer>
+<footer>아이온퓨처 전략기획팀이 쓴 보안 입문 글입니다. 출처는 맨 아래 「참고 자료」에 있습니다. v3.7 (2026-11-18)</footer>
 </body>
 </html>
