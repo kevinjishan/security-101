@@ -23,8 +23,11 @@ header.top h1 small{font-size:11px;color:var(--accent);letter-spacing:.15em;marg
 .mods button.done::after{content:"✓";font-size:10px;color:var(--ok);margin-left:4px}
 .score{margin-left:auto;font-size:12.5px;color:var(--soft)}
 .bar{height:4px;background:var(--rule)}.bar i{display:block;height:100%;background:var(--accent);transition:width .4s}
-main{flex:1;display:grid;grid-template-columns:minmax(0,6fr) minmax(0,4fr);gap:28px;padding:22px 28px 16px;max-width:1680px;width:100%;margin:0 auto}
-.left{min-width:0;display:flex;flex-direction:column;gap:8px}
+main{flex:1;display:flex;flex-direction:column;gap:18px;padding:18px 28px 28px;max-width:1280px;width:100%;margin:0 auto}
+.left{min-width:0;display:flex;flex-direction:column;gap:6px;align-items:center}
+.left .mapbox{width:min(100%,calc((100vh - 120px) * 1.14))}
+.left .mapnote{width:min(100%,calc((100vh - 120px) * 1.14))}
+.right{width:100%;max-width:1080px;margin:0 auto}
 .mapbox{position:relative;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:10px}
 .mapbox svg.m{width:100%;height:auto;display:block}
 .mapbox svg.ov{position:absolute;left:10px;top:10px;width:calc(100% - 20px);height:auto;pointer-events:none}
@@ -74,9 +77,10 @@ line.lg.v4{animation:var(--flow,none)}
 .s1{--pop1:pop 1s ease both}.s2{--pop2:pop 1s ease both}.s3{--pop3:pop 1s ease both}.s4{--pop4:pop 1s ease both}.s5{--pop5:pop 1s ease both}.s6{--pop6:pop 1s ease both}.s7{--pop7:pop 1s ease both}
 rect.c1{animation:var(--pop1,none)}rect.c2{animation:var(--pop2,none)}rect.c3{animation:var(--pop3,none)}rect.c4{animation:var(--pop4,none)}rect.c5{animation:var(--pop5,none)}rect.c6{animation:var(--pop6,none)}rect.c7{animation:var(--pop7,none)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.mdot{display:none}}
-@media (min-width:960px) and (max-width:1279px){main{grid-template-columns:1fr 1fr;gap:20px;padding:16px 18px}.body{font-size:16.5px}.right h2{font-size:22px}}
+@media (min-width:960px) and (max-width:1279px){main{padding:14px 18px 24px}.body{font-size:16.5px}.right h2{font-size:22px}}
 @media (max-width:959px){
- main{grid-template-columns:1fr;gap:12px;padding:12px}
+ main{gap:12px;padding:12px}
+ .left .mapbox,.left .mapnote{width:100%}
  .mapbox{cursor:zoom-in}.mapbox.big{position:fixed;inset:8px;z-index:50;overflow:auto;cursor:zoom-out}
  .mapbox.big svg.m{width:900px;max-width:none}.mapbox.big svg.ov{width:900px}
  .right h2{font-size:21px}.body{font-size:16.5px}
@@ -258,12 +262,14 @@ function prev(){if(st.view==='scene'){if(st.s>0)st.s--;else if(st.m>0){st.m--;st
 document.addEventListener('keydown',function(e){if(st.view!=='scene')return;if(e.key==='ArrowRight')next();if(e.key==='ArrowLeft')prev()});
 var tx=null;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
 document.addEventListener('touchend',function(e){if(tx===null||st.view!=='scene')return;var dx=e.changedTouches[0].clientX-tx;tx=null;if(Math.abs(dx)>60){dx<0?next():prev()}});
+function fromHash(){var h=/^#m(\d)(?:-(\d+|quiz|result))?$/.exec(location.hash);if(!h)return false;
+ st.m=+h[1];st.qi=0;st.view='scene';st.s=0;if(h[2]==='quiz')st.view='quiz';else if(h[2]==='result')st.view='result';else if(h[2])st.s=Math.min(+h[2],mod().scenes.length-1);return true}
+window.addEventListener('hashchange',function(){if(C&&fromHash())render()});
 $('#mapbox').addEventListener('click',function(){if(window.innerWidth<960)this.classList.toggle('big')});
 
 Promise.all([get('course.md'),get(BASE+'stages.html',true)]).then(function(r){
  C=parse(r[0]);SD=r[1];importCss(SD);importMap(SD);
- var h=/^#m(\d)(?:-(\d+|quiz|result))?$/.exec(location.hash);
- if(h){st.m=+h[1];if(h[2]==='quiz')st.view='quiz';else if(h[2]==='result')st.view='result';else if(h[2])st.s=Math.min(+h[2],mod().scenes.length-1)}
+ fromHash();
  render();
 }).catch(function(e){$('#right').innerHTML='<p class="src">불러오지 못했습니다: '+esc(e.message)+'</p>'});
 })();
