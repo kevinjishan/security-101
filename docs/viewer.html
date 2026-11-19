@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>화면 폭 확인 틀 | AION Tech Blog</title>
+<style>
+body{margin:0;background:#d9d6cf;font:400 14px/1.5 system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;color:#1c1b19}
+header{padding:10px 16px;background:#1c1b19;color:#f7f4ee;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+header b{margin-right:8px}
+header a{color:#f7f4ee;border:1px solid #777;border-radius:4px;padding:2px 8px;text-decoration:none}
+header a.on{background:#8c1d18;border-color:#8c1d18}
+#info{margin-left:auto;font-size:12px;opacity:.8}
+main{display:flex;justify-content:center;padding:24px 8px}
+iframe{border:0;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+</style>
+</head>
+<body>
+<header><b>화면 폭 확인 틀</b><span id="sizes"></span><span id="info"></span></header>
+<main><iframe id="f" title="확인 대상 쪽"></iframe></main>
+<script>
+(function(){
+  var p = new URLSearchParams(location.search);
+  var u = p.get('u') || 'index.html';
+  // 같은 사이트 안의 쪽만 띄운다(바깥 주소·자바스크립트 주소는 받지 않는다)
+  if (!/^[A-Za-z0-9_\-\/]+\.html(#[A-Za-z0-9_\-]+)?$/.test(u) || u.indexOf('..') >= 0) u = 'index.html';
+  var presets = [['폰 390×844',390,844],['작은 폰 360×740',360,740],['태블릿 768×1024',768,1024]];
+  var w = parseInt(p.get('w'),10) || 390, h = parseInt(p.get('h'),10) || 844;
+  if (w < 280 || w > 1600) w = 390; if (h < 400 || h > 2000) h = 844;
+  var f = document.getElementById('f');
+  f.style.width = w + 'px'; f.style.height = h + 'px'; f.src = u;
+  var s = document.getElementById('sizes');
+  presets.forEach(function(x){
+    var a = document.createElement('a');
+    a.textContent = x[0];
+    a.href = '?u=' + encodeURIComponent(u) + '&w=' + x[1] + '&h=' + x[2];
+    if (x[1] === w && x[2] === h) a.className = 'on';
+    s.appendChild(a); s.appendChild(document.createTextNode(' '));
+  });
+  document.getElementById('info').textContent = u + ' · ' + w + '×' + h;
+})();
+</script>
+</body>
+</html>
