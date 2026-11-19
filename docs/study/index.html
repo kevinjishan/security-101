@@ -61,6 +61,11 @@ main{flex:1;display:flex;flex-direction:column;gap:18px;padding:18px 28px 28px;m
 .wrongs li{margin:6px 0;font-size:15px}
 .ev{fill:var(--blue)}.evt{fill:#fff;font:700 13px sans-serif;text-anchor:middle}
 .evp{animation:evpulse 1.2s ease both}
+.evg .ev{fill:#9a968d}
+.evl{stroke:var(--blue);stroke-width:2.5;stroke-dasharray:6 5;fill:none;animation:bpop .6s ease 3s both}
+.evtag{animation:bpop .6s ease both}.evtag rect{fill:var(--card);stroke:var(--blue);stroke-width:1.5}.evtag text{fill:var(--blue);font:700 12.5px "Pretendard Variable",Pretendard,sans-serif}
+/* 퀴즈·결과 화면: 구성도를 줄여 물음과 보기가 첫 화면에 들어오게 한다 */
+@media (min-width:960px){body.qz .left .mapbox,body.qz .left .mapnote{width:min(100%,calc((100vh - 120px) * 0.55))}body.qz .mapnote{display:none}}
 @keyframes evpulse{0%{opacity:0;transform:scale(.3)}60%{opacity:1;transform:scale(1.25)}100%{opacity:1;transform:scale(1)}}
 @keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @keyframes pop{0%{opacity:.15}40%{opacity:1;stroke-width:4px}100%{opacity:1}}
@@ -148,9 +153,11 @@ function quiz(t){
  q.exp=clean(em?em[1]:(srcm?srcm[1]:''));
  if(!em&&srcm)q.exp=clean(srcm[1]);
  if(/\[위치 찾기\]/.test(head)){q.type='loc';q.stem=head.replace('[위치 찾기]','').trim();q.ans=(am?am[1]:'').trim();return q}
- if(/\[순서 맞추기\]/.test(head)){q.type='ord';var items=[];var re=/\((가|나|다|라)\)\s*([^()]+?)(?=\s*\((?:가|나|다|라)\)|$)/g,x;var h2=head.replace('[순서 맞추기]','');
+ if(/\[순서 맞추기\]/.test(head)){q.type='ord';var items=[];var h2=head.replace('[순서 맞추기]','');
   var stemEnd=h2.search(/\((가)\)/);q.stem=h2.slice(0,stemEnd).trim();
-  while((x=re.exec(h2.slice(stemEnd)))){items.push({k:x[1],t:x[2].trim()})}
+  // 보기는 (가)(나)(다)(라) 표지에서 자른다. 보기 안의 괄호 「(02:33)」은 보기 글로 남는다.
+  var parts=h2.slice(stemEnd).split(/\((가|나|다|라)\)\s*/);
+  for(var pi=1;pi<parts.length;pi+=2)items.push({k:parts[pi],t:(parts[pi+1]||'').trim()});
   q.opts=items;q.ans=(am?am[1]:'').replace(/\s/g,'').split('→');return q}
  if(/^\(O\/X\)/.test(head)){q.type='ox';q.stem=head.replace('(O/X)','').trim();q.ans=am?am[1].trim():'';return q}
  var om=/①(.*?)②(.*?)③(.*?)④(.*)$/.exec(head);
@@ -177,12 +184,29 @@ function importMap(doc){
    var mp=doc.createElementNS(NS,'mpath');mp.setAttribute('href','#'+id);a.appendChild(mp);c.appendChild(a);p.parentNode.appendChild(c)}});
  document.body.insertBefore(document.importNode(svg,true),document.body.firstChild);
 }
-function drawMap(stage,showEvent,label){
- var mb=$('#mapbox');
+// 새벽 사건 표지: ①=VPN 상자, ②=파일 서버 상자, ③=방화벽 상자 (별책 v2.0 구성도 좌표)
+var EVP={1:[128,367],2:[395,327],3:[128,287]};
+// 장면별 표시는 원고 [지도] 줄에 적힌 것만 옮긴다. tag=[번호,글,아래로 몇 칸], link=[출발,도착], grey=[번호]
+var EVS={
+ '3-6':{tag:[[3,'443 암호화',0]]},
+ '4-6':{grey:[3],link:[[2,1]],tag:[[2,'경보 02:15',0]]},
+ '5-6':{link:[[1,2],[2,3]],tag:[[1,'UEBA 점수',0]]},
+ '6-6':{tag:[[1,'휴대폰 승인',0],[2,'재확인',0],[2,'EDR 기록 02:21',1]]},
+ '7-5':{link:[[2,1]],tag:[[2,'경보 02:15',0],[2,'파워셸 02:21',1]]}
+};
+function drawMap(stage,sid,label){
+ var mb=$('#mapbox'),NS='http://www.w3.org/2000/svg';
  mb.innerHTML='<svg class="m cmap s'+stage+'" viewBox="0 0 720 630" role="img" aria-label="'+esc(label||('단계 '+stage+' 구성도'))+'"><use href="#map"/></svg><svg class="ov" viewBox="0 0 720 630" aria-hidden="true"></svg>';
- if(showEvent&&stage>=2){var ov=$('.ov',mb);[[128,367,'1'],[395,327,'2'],[128,287,'3']].forEach(function(p,k){
-  var g=document.createElementNS('http://www.w3.org/2000/svg','g');g.setAttribute('class','evp');g.style.animationDelay=(k*0.9+0.6)+'s';g.style.transformOrigin=p[0]+'px '+p[1]+'px';
-  g.innerHTML='<circle class="ev" cx="'+p[0]+'" cy="'+p[1]+'" r="11"/><text class="evt" x="'+p[0]+'" y="'+(p[1]+4.5)+'">'+p[2]+'</text>';ov.appendChild(g)})}
+ if(!sid||stage<2)return;var ov=$('.ov',mb),sp=EVS[sid]||{},grey=sp.grey||[];
+ (sp.link||[]).forEach(function(l){var a=EVP[l[0]],b=EVP[l[1]],ln=document.createElementNS(NS,'line');
+  ln.setAttribute('class','evl');ln.setAttribute('x1',a[0]);ln.setAttribute('y1',a[1]);ln.setAttribute('x2',b[0]);ln.setAttribute('y2',b[1]);ov.appendChild(ln)});
+ [1,2,3].forEach(function(n,k){var p=EVP[n];
+  var g=document.createElementNS(NS,'g');g.setAttribute('class','evp'+(grey.indexOf(n)>=0?' evg':''));g.style.animationDelay=(k*0.9+0.6)+'s';g.style.transformOrigin=p[0]+'px '+p[1]+'px';
+  g.innerHTML='<circle class="ev" cx="'+p[0]+'" cy="'+p[1]+'" r="11"/><text class="evt" x="'+p[0]+'" y="'+(p[1]+4.5)+'">'+n+'</text>';ov.appendChild(g)});
+ (sp.tag||[]).forEach(function(t,k){var p=EVP[t[0]],w=t[1].length*11+18,x,y;
+  if(t[0]===2){x=p[0]-w+14;y=p[1]+18+t[2]*26}else{x=p[0]+16;y=p[1]-11+t[2]*26}
+  var g=document.createElementNS(NS,'g');g.setAttribute('class','evtag');g.style.animationDelay=(3.4+k*0.6)+'s';
+  g.innerHTML='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="22" rx="5"/><text x="'+(x+9)+'" y="'+(y+15.5)+'">'+esc(t[1])+'</text>';ov.appendChild(g)});
 }
 
 // ---- 화면 ----
@@ -205,7 +229,7 @@ function linkSrc(t){return esc(t).replace(/\(([^()]*)\)\s*$/,function(all,inner)
   return '<span class="src">('+out+')</span>'})}
 function sceneView(){
  var M=mod(),S=M.scenes[st.s],R=$('#right');
- drawMap(M.n,/새벽 사건|따라갈 사건/.test(S.title),S.map);
+ drawMap(M.n,/새벽 사건|따라갈 사건/.test(S.title)?S.id:null,S.map);
  var dots=M.scenes.map(function(_,i){return '<i'+(i===st.s?' class="on"':'')+'></i>'}).join('')+'<i title="퀴즈"></i>';
  R.innerHTML='<div class="anim"><div class="crumb">모듈 '+M.n+' · '+esc(M.title)+' · '+S.id+' / '+M.scenes.length+'</div><h2>'+esc(S.title)+'</h2>'+
   (st.s===0&&M.goal?'<div class="goal"><b>학습 목표</b>'+esc(M.goal)+'</div>':'')+
@@ -215,7 +239,7 @@ function sceneView(){
 }
 function qView(){
  var M=mod(),Q=M.quiz[st.qi],R=$('#right');st.ans=null;
- drawMap(M.n<8?M.n:7,false);
+ drawMap(M.n<8?M.n:7,null);
  var h='<div class="anim"><div class="crumb">'+(M.n<8?'모듈 '+M.n+' 퀴즈':'종합 평가')+' · '+(st.qi+1)+' / '+M.quiz.length+'</div><p class="q">'+esc(Q.stem)+'</p><div class="opts" id="opts"></div><div id="fb"></div></div>'+
   '<div class="nav"><button id="pv">← 이전</button><button class="pri" id="nx" disabled>다음 문항 →</button></div>';
  R.innerHTML=h;var O=$('#opts');
@@ -254,6 +278,7 @@ function resultView(){
  if($('#nx'))$('#nx').onclick=function(){go(st.m+1,0,st.m+1===8?'quiz':'scene')};
 }
 function render(){header();if(mod().n===8&&st.view==='scene')st.view='quiz';
+ document.body.classList.toggle('qz',st.view!=='scene');
  if(st.view==='scene')sceneView();else if(st.view==='quiz')qView();else resultView();
  try{history.replaceState(null,'','#m'+st.m+(st.view==='scene'?'-'+st.s:'-'+st.view))}catch(e){}}
 function go(m,s,v){st.m=Math.max(0,Math.min(8,m));st.s=s||0;st.view=v||'scene';st.qi=0;render();window.scrollTo(0,0)}
