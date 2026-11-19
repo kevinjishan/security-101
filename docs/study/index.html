@@ -77,6 +77,10 @@ main{flex:1;display:flex;flex-direction:column;gap:18px;padding:18px 28px 28px;m
 path.ar:not(.d),path.ai,path.ag{stroke-dasharray:1;animation:draw 1.1s ease .25s both}
 path.ar.d{animation:bpop .8s ease .9s both}
 circle.bdr,circle.bdi,circle.bds,text.bdt{animation:bpop .6s ease .9s both}
+/* 새벽 사건 장면: 단계 번호(빨강)와 움직이는 점을 감추고 경로를 흐리게 해, 파란 사건 번호만 읽히게 한다 */
+.evm{--bdv:hidden;--aro:.22}
+circle.bdr,circle.bdi,circle.bds,text.bdt,circle.mdot,text.rqt{visibility:var(--bdv,inherit)}
+path.ar,path.ai,path.ag,path.rq{stroke-opacity:var(--aro,1)}
 line.lg.v4{animation:var(--flow,none)}
 .s4,.s5,.s6,.s7{--flow:flow 1s linear infinite}
 .s1{--pop1:pop 1s ease both}.s2{--pop2:pop 1s ease both}.s3{--pop3:pop 1s ease both}.s4{--pop4:pop 1s ease both}.s5{--pop5:pop 1s ease both}.s6{--pop6:pop 1s ease both}.s7{--pop7:pop 1s ease both}
@@ -197,7 +201,7 @@ var EVS={
 function drawMap(stage,sid,label){
  var mb=$('#mapbox'),NS='http://www.w3.org/2000/svg';
  mb.innerHTML='<svg class="m cmap s'+stage+'" viewBox="0 0 720 630" role="img" aria-label="'+esc(label||('단계 '+stage+' 구성도'))+'"><use href="#map"/></svg><svg class="ov" viewBox="0 0 720 630" aria-hidden="true"></svg>';
- if(!sid||stage<2)return;var ov=$('.ov',mb),sp=EVS[sid]||{},grey=sp.grey||[];
+ if(!sid||stage<2)return;$('svg.m',mb).classList.add('evm');var ov=$('.ov',mb),sp=EVS[sid]||{},grey=sp.grey||[];
  (sp.link||[]).forEach(function(l){var a=EVP[l[0]],b=EVP[l[1]],ln=document.createElementNS(NS,'line');
   ln.setAttribute('class','evl');ln.setAttribute('x1',a[0]);ln.setAttribute('y1',a[1]);ln.setAttribute('x2',b[0]);ln.setAttribute('y2',b[1]);ov.appendChild(ln)});
  [1,2,3].forEach(function(n,k){var p=EVP[n];
