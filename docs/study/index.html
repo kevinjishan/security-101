@@ -191,10 +191,10 @@ function importMap(doc){
 // 새벽 사건 표지: ①=VPN 상자, ②=파일 서버 상자, ③=방화벽 상자 (별책 v2.0 구성도 좌표)
 var EVP={1:[128,367],2:[395,327],3:[128,287]};
 // 장면별 표시는 원고 [지도] 줄에 적힌 것만 옮긴다. tag=[번호,글,아래로 몇 칸], link=[출발,도착], grey=[번호]
-// dim=흐리게. 단계 0·1에는 VPN·방화벽 상자가 없어도 같은 좌표에 띄운다(원고 0-4·1-5 [지도] 줄)
+// dim=흐리게. pos=그 장면에서만 옮길 자리. 단계 1은 방화벽 자리에 「라우터 ACL」이 서므로 ③을 그 상자 아래 빈칸으로 내린다(원고 27행: 기록은 방화벽)
 var EVS={
- '0-4':{},
- '1-5':{dim:1},
+ '0-4':{pos:{3:[128,322]}},
+ '1-5':{dim:1,pos:{3:[128,322]}},
  '3-6':{tag:[[3,'443 암호화',0]]},
  '4-6':{grey:[3],link:[[2,1]],tag:[[2,'경보 02:15',0]]},
  '5-6':{link:[[1,2],[2,3]],tag:[[1,'UEBA 점수',0]]},
@@ -207,7 +207,7 @@ function drawMap(stage,sid,label){
  if(!sid)return;$('svg.m',mb).classList.add('evm');var ov=$('.ov',mb),sp=EVS[sid]||{},grey=sp.grey||[];
  (sp.link||[]).forEach(function(l){var a=EVP[l[0]],b=EVP[l[1]],ln=document.createElementNS(NS,'line');
   ln.setAttribute('class','evl');ln.setAttribute('x1',a[0]);ln.setAttribute('y1',a[1]);ln.setAttribute('x2',b[0]);ln.setAttribute('y2',b[1]);ov.appendChild(ln)});
- [1,2,3].forEach(function(n,k){var p=EVP[n];
+ [1,2,3].forEach(function(n,k){var p=(sp.pos&&sp.pos[n])||EVP[n];
   var g=document.createElementNS(NS,'g');g.setAttribute('class','evp'+(grey.indexOf(n)>=0?' evg':'')+(sp.dim?' evd':''));g.style.animationDelay=(k*0.9+0.6)+'s';g.style.transformOrigin=p[0]+'px '+p[1]+'px';
   g.innerHTML='<circle class="ev" cx="'+p[0]+'" cy="'+p[1]+'" r="11"/><text class="evt" x="'+p[0]+'" y="'+(p[1]+4.5)+'">'+n+'</text>';ov.appendChild(g)});
  (sp.tag||[]).forEach(function(t,k){var p=EVP[t[0]],w=t[1].length*11+18,x,y;
